@@ -21,11 +21,11 @@
 Key_Click_t key_click;
 
 KEY_INFO_t key_info_list[] = {
-    {KEY_ID_M,  "CENTER",    GPIOB, GPIO_Pin_12, KEY_STATE_UP, 0, 0},
-    {KEY_ID_L,  "LEFT",  GPIOB, GPIO_Pin_13, KEY_STATE_UP, 0, 0},
-    {KEY_ID_R,  "RIGHT",  GPIOB, GPIO_Pin_14, KEY_STATE_UP, 0, 0},
-    {KEY_ID_D,  "DOWN",  GPIOB, GPIO_Pin_15, KEY_STATE_UP, 0, 0},
-    {KEY_ID_U,  "UP",  GPIOA, GPIO_Pin_8,  KEY_STATE_UP, 0, 0},
+    {KEY_ID_M,  "CENTER",    GPIOA, GPIO_Pin_8, KEY_STATE_UP, 0, 0},
+    {KEY_ID_D,  "DOWN",  GPIOB, GPIO_Pin_13, KEY_STATE_UP, 0, 0},
+    {KEY_ID_U,  "UP",  GPIOB, GPIO_Pin_12,  KEY_STATE_UP, 0, 0},
+    {KEY_ID_L,  "LEFT",  GPIOB, GPIO_Pin_14, KEY_STATE_UP, 0, 0},
+    {KEY_ID_R,  "RIGHT",  GPIOB, GPIO_Pin_15, KEY_STATE_UP, 0, 0},
     {KEY_ID_F1, "F1",  GPIOC, GPIO_Pin_13,  KEY_STATE_UP, 0, 0},
     {KEY_ID_F2, "F2",  GPIOC, GPIO_Pin_14,  KEY_STATE_UP, 0, 0},
     {KEY_ID_F3, "F3",  GPIOC, GPIO_Pin_15,  KEY_STATE_UP, 0, 0},

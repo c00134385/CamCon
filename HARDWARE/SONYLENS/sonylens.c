@@ -1397,7 +1397,7 @@ void sonylens_init(void) {
     camera_power_on_sec = GetSysTick_Sec();
     printf("\r\n wait until camera initialize completely");
     while(1) {
-        if(GetSysTick_Sec() > (camera_power_on_sec + 30)) {
+        if(GetSysTick_Sec() > (camera_power_on_sec + 25)) {
             printf("\r\n timeout");
             break;
         }

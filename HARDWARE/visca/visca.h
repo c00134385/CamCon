@@ -48,6 +48,7 @@ typedef struct _VISCA_packet
     VISCA_type_e type;
 } VISCA_packet_t;
 
+void visca_send_packet(VISCA_packet_t *packet);
 void visca_init(void);
 void visca_append_byte(VISCA_packet_t *packet, unsigned char byte);
 void visca_init_packet(VISCA_packet_t *packet, int address);
@@ -231,5 +232,10 @@ VISCA_result_e visca_set_center_line_display(int address, uint8 enable);
 void visca_version_inq(void);
 void visca_version_set(void);
 
+VISCA_result_e visca_menu_center(int address);
+VISCA_result_e visca_menu_up(int address);
+VISCA_result_e visca_menu_down(int address);
+VISCA_result_e visca_menu_left(int address);
+VISCA_result_e visca_menu_right(int address);
 
 #endif

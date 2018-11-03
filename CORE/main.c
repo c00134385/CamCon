@@ -80,6 +80,7 @@ int main(void)
 	u32 zoom_value;
     BOOL cam_initialized = false;
 	VISCA_result_e result;
+    long start_time;
         
 	delay_init();	    	 //???????	  
 	NVIC_Configuration(); 	 //??NVIC????2:2??????,2??????
@@ -110,6 +111,7 @@ int main(void)
 	UART2_Configuration();
     //uart2_set_input_byte_callback(uart2_callback);
 	UART3_Configuration();
+    
 
 	#ifdef LT8618SX_ENABLE
 	LT8618SX_Configure();
