@@ -25,5 +25,18 @@ typedef enum CAM_UNIT_TEST {
 };
 
 void cam_unit_test(void);
+bool cam_unit_is_menu_on(void);
+void cam_unit_menu_toggle(void);
+void cam_unit_menu_on(void);
+void cam_unit_menu_off(void);
+void cam_unit_menu_up(void);
+void cam_unit_menu_down(void);
+void cam_unit_menu_left(void);
+void cam_unit_menu_right(void);
+void cam_unit_power_switch(void);
+void cam_unit_mode_switch(void);
+void cam_unit_expcomp_down(void);
+void cam_unit_expcomp_up(void);
+
 
 #endif

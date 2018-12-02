@@ -232,6 +232,10 @@ VISCA_result_e visca_set_center_line_display(int address, uint8 enable);
 void visca_version_inq(void);
 void visca_version_set(void);
 
+VISCA_result_e visca_set_expcomp_reset(int address);
+VISCA_result_e visca_set_expcomp_up(int address);
+VISCA_result_e visca_set_expcomp_down(int address);
+
 VISCA_result_e visca_menu_center(int address);
 VISCA_result_e visca_menu_up(int address);
 VISCA_result_e visca_menu_down(int address);

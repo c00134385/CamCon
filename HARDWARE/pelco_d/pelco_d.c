@@ -20,6 +20,7 @@
 
 /* include */
 #include "includes.h"
+#include "cam_test.h"
 
 #define PELCO_D_INPUT_BUFFER_SIZE   (32)
 
@@ -42,7 +43,8 @@ int pelco_d_init(void)
     msg_queue.state = MSG_Q_STATE_EMPTY;
     msg_queue.size = sizeof(msg_queue.msg_list)/sizeof(PELCO_D_MSG_t);
     
-    uart3_set_rx_callback(pelco_d_input_byte);    
+    uart3_set_rx_callback(pelco_d_input_byte); 
+    UART3_set_baudrate(2400);
     return 0;
 }
 
@@ -166,7 +168,7 @@ void pelco_d_handle(PELCO_D_TYPE_e cmd)
     {
         case PELCO_D_TYPE_STOP:
             printf("\r\n cmd: PELCO_D_TYPE_STOP");
-            sonylens_set_zoom_stop();
+            cam_unit_zoom_stop();
             sonylens_set_focus_stop();
             break;
         case PELCO_D_TYPE_RIGHT:
@@ -183,31 +185,31 @@ void pelco_d_handle(PELCO_D_TYPE_e cmd)
             break;
         case PELCO_D_TYPE_ZOOM_TELE:
             printf("\r\n cmd: PELCO_D_TYPE_ZOOM_TELE");
-            if(sonylens_remote_is_menu_on())
+            if(cam_unit_is_menu_on())
             {
-                sonylens_remote_navi_left();
+                cam_unit_menu_left();
             }
             else
             {
-                sonylens_set_zoom_tele();
+                cam_unit_zoom_tele();
             }
             break;
         case PELCO_D_TYPE_ZOOM_WIDE:
             printf("\r\n cmd: PELCO_D_TYPE_ZOOM_WIDE");
-            if(sonylens_remote_is_menu_on())
+            if(cam_unit_is_menu_on())
             {
-                sonylens_remote_navi_right();
+                cam_unit_menu_right();
             }
             else
             {
-                sonylens_set_zoom_wide();
+                cam_unit_zoom_wide();
             }
             break;
         case PELCO_D_TYPE_FOCUS_FAR:
             printf("\r\n cmd: PELCO_D_TYPE_FOCUS_FAR");
-            if(sonylens_remote_is_menu_on())
+            if(cam_unit_is_menu_on())
             {
-                sonylens_remote_navi_up();
+                cam_unit_menu_up();
             }
             else
             {
@@ -216,9 +218,9 @@ void pelco_d_handle(PELCO_D_TYPE_e cmd)
             break;
         case PELCO_D_TYPE_FOCUS_NEAR:
             printf("\r\n cmd: PELCO_D_TYPE_FOCUS_NEAR");
-            if(sonylens_remote_is_menu_on())
+            if(cam_unit_is_menu_on())
             {
-                sonylens_remote_navi_down();
+                cam_unit_menu_down();
             }
             else
             {
@@ -244,7 +246,9 @@ void pelco_d_handle(PELCO_D_TYPE_e cmd)
             printf("\r\n cmd: PELCO_D_TYPE_SCAN_MANUAL");
             break;
         case PELCO_D_TYPE_NAVI_C:
-            sonylens_remote_navi_ok();
+            // menu_on / menu_off
+            cam_unit_menu_toggle();
+            //sonylens_remote_navi_ok();
             break;
         default:
             printf("\r\n cmd: PELCO_D_TYPE_UNKNOWN");
@@ -257,40 +261,44 @@ void pelco_handle_cmd(PELCO_CMD_e cmd) {
     switch(cmd)
     {
         case PELCO_CMD_F1:
-            sonylens_control_f1();
+            //sonylens_control_f1();
+            cam_unit_power_switch();
             break;
         case PELCO_CMD_F2:
-            sonylens_control_f2();
+            //sonylens_control_f2();
             break;
         case PELCO_CMD_F3:
-            sonylens_control_f3();
+            //sonylens_control_f3();
             break;
         case PELCO_CMD_F4:
-            sonylens_control_f4();
+            //sonylens_control_f4();
             break;
         case PELCO_CMD_F5:
-            sonylens_control_f5();
+            //sonylens_control_f5();
+            cam_unit_expcomp_up();
             break;
         case PELCO_CMD_F6:
-            sonylens_control_f6();
+            //sonylens_control_f6();
+            cam_unit_expcomp_down();
             break;
         case PELCO_CMD_F7:
-            sonylens_control_f7();
+            //sonylens_control_f7();
+            cam_unit_mode_switch();
             break;
         case PELCO_CMD_F8:
-            sonylens_control_f8();
+            //sonylens_control_f8();
             break;
         case PELCO_CMD_F9:
-            sonylens_control_f9();
+            //sonylens_control_f9();
             break;
         case PELCO_CMD_F10:
-            sonylens_control_f10();
+            //sonylens_control_f10();
             break;
         case PELCO_CMD_F11:
-            sonylens_control_f11();
+            //sonylens_control_f11();
             break;
         case PELCO_CMD_F12:
-            sonylens_control_f12();
+            //sonylens_control_f12();
             break;
         default:
             break;

@@ -2738,6 +2738,134 @@ VISCA_result_e visca_set_advance_expcomp(int address, uint8 value) {
     return ret;
 }
 
+
+VISCA_result_e visca_set_expcomp_reset(int address) {
+    //0x0e
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_COMMAND);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x0E);
+    visca_append_byte(&packet, 0x00);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+    
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_ack);
+
+    printf("\r\n set expcomp reset");
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
+            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
+                printf("\r\n set expcomp reset done!");
+                ret = VISCA_result_ok;
+                break;
+            } else {
+                visca_print(input_buf, input_buf_index);
+                ret = VISCA_result_fail;
+                break;
+            }
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+
+    visca_set_state(VISCA_state_idle);
+    return ret;
+}
+
+VISCA_result_e visca_set_expcomp_up(int address) {
+    //0x0e
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_COMMAND);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x0E);
+    visca_append_byte(&packet, 0x02);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+    
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_ack);
+
+    printf("\r\n set expcomp up");
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
+            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
+                printf("\r\n set expcomp up done!");
+                ret = VISCA_result_ok;
+                break;
+            } else {
+                visca_print(input_buf, input_buf_index);
+                ret = VISCA_result_fail;
+                break;
+            }
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+
+    visca_set_state(VISCA_state_idle);
+    return ret;
+}
+
+VISCA_result_e visca_set_expcomp_down(int address) {
+    //0x0e
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_COMMAND);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x0E);
+    visca_append_byte(&packet, 0x03);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+    
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_ack);
+
+    printf("\r\n set expcomp down");
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
+            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
+                printf("\r\n set expcomp down done!");
+                ret = VISCA_result_ok;
+                break;
+            } else {
+                visca_print(input_buf, input_buf_index);
+                ret = VISCA_result_fail;
+                break;
+            }
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+
+    visca_set_state(VISCA_state_idle);
+    return ret;
+}
+
+
 VISCA_result_e visca_get_advance_wdr(int address, uint8 *value) {
     VISCA_result_e ret = VISCA_result_ok;
     return ret;
