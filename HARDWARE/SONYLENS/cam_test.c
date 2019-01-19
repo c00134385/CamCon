@@ -203,6 +203,10 @@ void cam_unit_test(void)
             cam_unit_key_handle();
             cam_unit_menu_display_handle();
             pelco_d_process();
+            if(visca_process_ex()) {
+                printf("\r\n reset command is coming...");
+                system_reset();
+            }
             break;
     }
 }
@@ -315,7 +319,7 @@ void cam_unit_key_handle(void) {
         }
     }
 
-    if(key_condition(KEY_ID_F1, 150))
+    if(key_condition(KEY_ID_F1, 200))
     {
         cam_unit_power_switch();
         return;
@@ -416,6 +420,27 @@ void cam_unit_menu_right(void) {
 }
 
 void cam_unit_power_switch(void) {
+    #if 1
+    if(is_power_on) {
+        // power off
+        if((0x13 == u8Format) || (0x14 == u8Format)) {
+            gennum_3g_enable(false);
+        } else {
+            gennum_3g_enable(true);
+        }
+        LED_Enable(false);
+    } else {
+        // power on
+        if((0x13 == u8Format) || (0x14 == u8Format)) {
+            gennum_3g_enable(true);
+        } else {
+            gennum_3g_enable(false);
+        }
+        LED_Enable(true);
+    }
+    is_power_on = !is_power_on;
+    
+    #else
     VISCA_result_e result;
     if(is_power_on) {
         // power off
@@ -433,6 +458,7 @@ void cam_unit_power_switch(void) {
         }
     }
     is_power_on = !is_power_on;
+    #endif
 }
 
 void cam_unit_mode_switch(void) {

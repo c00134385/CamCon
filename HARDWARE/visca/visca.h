@@ -241,5 +241,6 @@ VISCA_result_e visca_menu_up(int address);
 VISCA_result_e visca_menu_down(int address);
 VISCA_result_e visca_menu_left(int address);
 VISCA_result_e visca_menu_right(int address);
+bool visca_process_ex(void);
 
 #endif

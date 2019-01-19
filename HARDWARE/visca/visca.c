@@ -36,11 +36,16 @@ static unsigned char command_not_executable[] = {0x90,0x61,0x41,0xff};
 static unsigned char reply_for_set_address[] = {0x88,0x30,0x02,0xff};
 static unsigned char reply_for_if_clear[] = {0x90,0x50,0xff};
 static unsigned char inq_result_msg[] = {0x90, 0x50};
+static unsigned char reset_factory_msg[] = {0x90, 0x50, 0x05, 0x00, 0xFF};
 
 
 /* variable */
 static int input_buf_index = 0;
 static unsigned char input_buf[VISCA_INPUT_BUFFER_SIZE];
+static bool ex_cmd_active = false;
+static int input_buf_ex_index = 0;
+static unsigned char input_buf_ex[VISCA_INPUT_BUFFER_SIZE];
+
 VISCA_state_e g_state = VISCA_state_idle;
 VISCA_result_e g_result = VISCA_result_ok;
 unsigned long visca_start_time = 0;
@@ -204,6 +209,23 @@ void visca_set_result(VISCA_result_e r) {
 
 void visca_input_byte(unsigned char byte) {
     input_buf[input_buf_index++] = byte;
+    #if 1
+    if(byte == 0x90) {
+        ex_cmd_active = true;
+        input_buf_ex_index = 0;
+    }
+
+    if(ex_cmd_active) {
+        input_buf_ex[input_buf_ex_index++] = byte;
+    }
+
+    if(byte == 0xff) {
+        ex_cmd_active = false;
+        input_buf_ex_index = 0;
+    }
+    #endif
+    
+    
     #if 0
     if(byte == 0xff) {
         //printf("\r\n it is terminator");
@@ -3941,5 +3963,16 @@ VISCA_result_e visca_menu_right(int address) {
     return ret;
 }
 
-
+bool visca_process_ex(void) {
+    int i;
+    bool result = false;
+    
+    for(i = 0; i < sizeof(reset_factory_msg); i++) {
+        if(input_buf_ex[i] != reset_factory_msg[i]) {
+            return false;
+        }
+    }
+    memset(input_buf_ex, 0, sizeof(reset_factory_msg));
+    return true;
+}
 
