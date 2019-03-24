@@ -1,3 +1,7 @@
+#ifndef __UART2_D_H
+#define __UART2_D_H
+
+
 typedef void (*uart2_input_byte_callback)(unsigned char);
 void UART2_Configuration(void);
 int uart2_comm_get_length(void);
@@ -8,3 +12,4 @@ void uart2_comm_clear(void);
 void uart2_print_rx_data(void);
 void uart2_set_input_byte_callback(uart2_input_byte_callback cb);
 
+#endif

@@ -241,7 +241,7 @@ unsigned long sonylens_send_msg_time = 0;  ////µ¥Î»Ãë
 #define SONYLENS_10_S_DELAY  (10)
 unsigned long sonylens_task1_completion_time;
 
-const char version[SONYLENS_VERSION_SIZE] = "JY1808";
+const char version[SONYLENS_VERSION_SIZE] = "JY1901";
 const CONFIG_PARAMS_t default_config_params = {
     0, 1,
     {// zoom
@@ -1388,22 +1388,11 @@ void sonylens_init(void) {
     key_exp_gain = config_params.exposure.gain;
     key_focus_mode = config_params.focus.mode;
 
-	// power camera after the eeprom data is ready;
-	sony_ui_init();
+	// power on camera after the eeprom data is ready;
+	video_enable(true);
+	
+    sony_ui_init();
 
-    gennum_3g_enable(true);
-    Wait10Ms(10);
-    video_enable(true);
-    camera_power_on_sec = GetSysTick_Sec();
-    printf("\r\n wait until camera initialize completely");
-    while(1) {
-        if(GetSysTick_Sec() > (camera_power_on_sec + 30)) {
-            printf("\r\n timeout");
-            break;
-        }
-    }
-
-    #if 0
     if((0 == config_params.general.format) || (1 == config_params.general.format))
     {
         gennum_3g_enable(true);
@@ -1412,7 +1401,8 @@ void sonylens_init(void) {
     {
         gennum_3g_enable(false);
     }
-    #endif
+
+    Wait10Ms(10);
 }
 
 void sonylens_zoom_init(void) 
@@ -4938,8 +4928,8 @@ uint8 sonylens_get_monitor_mode(int index)
         case 9:
             value = 0x11;
             break;
-        case 10:
-            value = 0x13;
+        default:
+            value = 0x7;  // 1080P30
             break;
     }
 
@@ -6934,7 +6924,7 @@ void sonylens_task(void)
             video_enable(false);
             Wait10Ms(50);
             video_enable(true);
-            sonylens_taskstate = SONY_IDLE_2;
+            sonylens_taskstate = SONY_SET_ADDRESS;
         }
         else
         {

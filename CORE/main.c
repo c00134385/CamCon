@@ -25,7 +25,7 @@ unsigned long main_task_t_sec = 0;  ////µ•Œª√Î
 
 static u8 Lock_Code[4]; // 
 const u32 Lock_Code_Holder = 0x9136FB19;
-BOOL checkLockCode(void)
+BOOL checkIdCode(void)
 {
 	u32 CpuID[3];
 	u32 code;
@@ -93,7 +93,7 @@ int main(void)
 	LED_Init();
     
 
-	//check = checkLockCode();
+	//check = checkIdCode();
 	if(!check)
 	{
 		printf("%c", 64);
@@ -127,10 +127,6 @@ int main(void)
     // inquire version
     //result = visca_set_zoom_wide_speed(1, 0);
     //printf("\r\n set monitor mode failed. result:%d", result);
-
-    while(1) {
-        cam_unit_test();
-    }
 	
 	while(1)
 	{
