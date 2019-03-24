@@ -1390,7 +1390,12 @@ void sonylens_init(void) {
 
 	// power on camera after the eeprom data is ready;
 	video_enable(true);
-	
+
+    // sleep 30s for waiting for the camera ready
+    printf("\r\n wait....%d", GetSysTick_Sec());
+    Wait10Ms(100*10);
+    printf("\r\n wait....done. %d", GetSysTick_Sec());
+
     sony_ui_init();
 
     if((0 == config_params.general.format) || (1 == config_params.general.format))
@@ -3566,6 +3571,84 @@ void sonylens_key_handle_process(void)
     }
 }
 
+void sonylens_key_handle_process_basic(void)
+{
+   if(key_is_pressed(KEY_ID_U))
+    {
+        // focus near limit +
+        //uint32 tempValue = 0;
+        //sonylens_get_zoom_value(&tempValue);
+        //printf("\r\n current zoom value is :~~~~~~~~~~~~~~~~~~~~~~%08x", tempValue);
+        sonylens_set_focus_far();
+        return;
+    }
+    else if(key_is_unpressed(KEY_ID_U))
+    {
+        sonylens_set_focus_stop();
+        return;
+    }
+
+    if(key_is_pressed(KEY_ID_D))
+    {
+        // focus near limit +
+        sonylens_set_focus_near();
+        return;
+    }
+    else if(key_is_unpressed(KEY_ID_D))
+    {
+        sonylens_set_focus_stop();
+        return;
+    }
+
+    if(key_is_pressed(KEY_ID_L))
+    {
+        // zoom-
+        sonylens_set_zoom_wide();
+        return;
+    }
+    else if(key_is_unpressed(KEY_ID_L))
+    {
+        sonylens_set_zoom_stop();
+        return;
+    }
+
+    if(key_is_pressed(KEY_ID_R))
+    {
+        // zoom-
+        sonylens_set_zoom_tele();
+        return;
+    }
+    else if(key_is_unpressed(KEY_ID_R))
+    {
+        sonylens_set_zoom_stop();
+        return;
+    }
+
+    if(key_is_pressed(KEY_ID_F8))
+    {
+        // zoom-
+        sonylens_set_zoom_wide();
+        return;
+    }
+    else if(key_is_unpressed(KEY_ID_F8))
+    {
+        sonylens_set_zoom_stop();
+        return;
+    }
+
+    if(key_is_pressed(KEY_ID_F7))
+    {
+        // zoom-
+        sonylens_set_zoom_tele();
+        return;
+    }
+    else if(key_is_unpressed(KEY_ID_F7))
+    {
+        sonylens_set_zoom_stop();
+        return;
+    }
+}
+
 
 /* zoom set */
 char* zoom_speed[] = {
@@ -4905,7 +4988,7 @@ uint8 sonylens_get_monitor_mode(int index)
             value = 0x14;
             break;
         case 2:
-            value = 0x7;
+            value = 0x6;
             break;
         case 3:
             value = 0x8;
@@ -6902,7 +6985,7 @@ void sonylens_task(void)
             if(value == sonylens_get_monitor_mode(config_params.general.format))
             {
                 printf("\r\n it is expected(0x%x).", value);
-                sonylens_taskstate = SONY_CLEAR_TITLES;
+                sonylens_taskstate = SONY_IDLE_2;
             }
             else
             {
@@ -6924,6 +7007,7 @@ void sonylens_task(void)
             video_enable(false);
             Wait10Ms(50);
             video_enable(true);
+            Wait10Ms(100*3);
             sonylens_taskstate = SONY_SET_ADDRESS;
         }
         else
@@ -7043,6 +7127,8 @@ void sonylens_task(void)
 		
 		break;
     case SONY_IDLE_2:
+        // key process
+        sonylens_key_handle_process_basic();
         break;
 	default:
 		break;

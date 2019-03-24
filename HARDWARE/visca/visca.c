@@ -390,10 +390,10 @@ VISCA_result_e visca_set_address(int address) {
 }
 
 VISCA_result_e visca_if_clear(int address) {
-    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_result_e ret = VISCA_result_ok;
     VISCA_packet_t packet;
     visca_set_state(VISCA_state_send);
-    visca_init_packet(&packet, address);
+    visca_init_broadcast_packet(&packet);
     visca_append_byte(&packet, VISCA_COMMAND);
     visca_append_byte(&packet, VISCA_CATEGORY_INTERFACE);
     visca_append_byte(&packet, 0x01);
@@ -406,6 +406,9 @@ VISCA_result_e visca_if_clear(int address) {
 
     printf("\r\n if clear done?");
 
+    Wait10Ms(50);
+    visca_print(input_buf, input_buf_index);
+    #if 0
     while(true) {
         Wait10Ms(1);
         if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
@@ -429,6 +432,7 @@ VISCA_result_e visca_if_clear(int address) {
             break;
         }
     }
+    #endif
 
     visca_set_state(VISCA_state_idle);
     return ret;
