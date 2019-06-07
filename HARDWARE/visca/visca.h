@@ -69,6 +69,9 @@ VISCA_result_e visca_set_register(int address, uint8 register, uint8 value);
 VISCA_result_e visca_get_zoom_value(int address, uint32 *value);
 VISCA_result_e visca_set_zoom_value(int address, uint32 value);
 
+VISCA_result_e visca_get_mute(int address, uint8 *value);
+
+VISCA_result_e visca_get_display(int address, uint8 *value);
 VISCA_result_e visca_set_display(int address, uint8 mode);
 
 VISCA_result_e visca_get_title_display(int address, uint8 *enable);
@@ -86,8 +89,6 @@ VISCA_result_e visca_set_title(int address, uint8 line, unsigned char* title);
 VISCA_result_e visca_set_zoom_stop(int address);
 VISCA_result_e visca_set_zoom_wide(int address);
 VISCA_result_e visca_set_zoom_tele(int address);
-
-
 
 VISCA_result_e visca_get_zoom_tele_speed(int address, uint8 *speed);
 VISCA_result_e visca_set_zoom_tele_speed(int address, uint8 speed);
@@ -227,6 +228,9 @@ VISCA_result_e visca_set_privacy_display(int address, uint32 display);
 
 VISCA_result_e visca_get_center_line_display(int address);
 VISCA_result_e visca_set_center_line_display(int address, uint8 enable);
+
+VISCA_result_e visca_get_ept(int address, uint8 *value);
+VISCA_result_e visca_set_ept(int address, uint8 value);
 
 void visca_version_inq(void);
 void visca_version_set(void);

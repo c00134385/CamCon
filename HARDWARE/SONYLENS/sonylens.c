@@ -241,7 +241,7 @@ unsigned long sonylens_send_msg_time = 0;  ////µ¥Î»Ãë
 #define SONYLENS_10_S_DELAY  (10)
 unsigned long sonylens_task1_completion_time;
 
-const char version[SONYLENS_VERSION_SIZE] = "JY1901";
+const char version[SONYLENS_VERSION_SIZE] = "JY1902";
 const CONFIG_PARAMS_t default_config_params = {
     0, 1,
     {// zoom
@@ -4884,14 +4884,21 @@ char* sonylens_image_pic_effect_right(void)
 
 /* general */
 //int current_general_format = 0;
+#if 0
 char* general_format[] = {
     "1080P60", "1080P50", "1080P30", "1080P25", 
     "1080I60", "1080I50", 
     "720P60", "720P50", "720P30", "720P25",
-    #if 0
-    "1080P59.94"
-    #endif
 };
+#else
+char* general_format[] = {
+    "4KP30", "4KP25", "4KP24", 
+    "1080P60", "1080P50", "1080P30", "1080P25",
+    "1080I60", "1080I50", 
+    "720P60", "720P50", "720P24",
+};
+
+#endif
 
 uint8 sonylens_get_monitor_mode(int index)
 {
@@ -4899,37 +4906,43 @@ uint8 sonylens_get_monitor_mode(int index)
     switch(index)
     {
         case 0:
-            value = 0x15;
+            value = 0x1D;
             break;
         case 1:
-            value = 0x14;
+            value = 0x1E;
             break;
         case 2:
-            value = 0x7;
+            value = 0x20;
             break;
         case 3:
-            value = 0x8;
+            value = 0x13;
             break;
         case 4:
-            value = 0x2;
+            value = 0x14;
             break;
         case 5:
-            value = 0x4;
+            value = 0x06;
             break;
         case 6:
-            value = 0xA;
+            value = 0x08;
             break;
         case 7:
-            value = 0xC;
+            value = 0x1;
             break;
         case 8:
-            value = 0xF;
+            value = 0x4;
             break;
         case 9:
-            value = 0x11;
+            value = 0x09;
+            break;
+        case 10:
+            value = 0xC;
+            break;
+        case 11:
+            value = 0x1F;
             break;
         default:
-            value = 0x7;  // 1080P30
+            value = 0x13;  // 1080P60
             break;
     }
 
@@ -4938,7 +4951,7 @@ uint8 sonylens_get_monitor_mode(int index)
 
 int sonylens_general_format_get_count(void)
 {
-    return 10;
+    return 12;
 }
 int sonylens_general_format_get(void)
 {
@@ -6786,8 +6799,8 @@ void sonylens_task(void)
         {
             if(keying_time > 500)
             {
-                printf("\r\n set format to 720P25");
-                config_params.general.format = 9; // 720P25
+                printf("\r\n set format to 1080P25");
+                config_params.general.format = 6; // 720P25
                 sonylens_write_config_params(&config_params);
                 sonylens_taskstate = SONY_VISCA_INIT;
             }
@@ -6796,7 +6809,7 @@ void sonylens_task(void)
         {
             if(keying_time > 500)
             {
-                printf("\r\n set format to 1080P25");
+                printf("\r\n set format to 1080P60");
                 config_params.general.format = 3; // 1080P25
                 sonylens_write_config_params(&config_params);
                 sonylens_taskstate = SONY_VISCA_INIT;
