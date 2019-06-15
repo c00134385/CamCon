@@ -241,7 +241,7 @@ unsigned long sonylens_send_msg_time = 0;  ////µ¥Î»Ãë
 #define SONYLENS_10_S_DELAY  (10)
 unsigned long sonylens_task1_completion_time;
 
-const char version[SONYLENS_VERSION_SIZE] = "JY1902";
+const char version[SONYLENS_VERSION_SIZE] = "JY1905";
 const CONFIG_PARAMS_t default_config_params = {
     0, 1,
     {// zoom
@@ -262,8 +262,8 @@ const CONFIG_PARAMS_t default_config_params = {
 
     {// exposure
         0, //ae_mode;
+        8,
         10,
-        6,
         0, //gain;
         0,
         0, //slow_ae;
@@ -272,8 +272,8 @@ const CONFIG_PARAMS_t default_config_params = {
 
     {// wb
         0, //wb_mode;
-        195, //red_gain;
-        185, //blue_gain;
+        202, //red_gain;
+        175, //blue_gain;
     },
 
     {// advance
@@ -3920,25 +3920,40 @@ char* sonylens_exposure_ae_mode_right(void)
     return exposure_ae_mode[config_params.exposure.ae_mode];
 }
 
+//60/30/59.94/29.97
 char* exposure_shutter[] = {
-    "1/1", "1/2", "1/4", "1/8", "1/15",
-    "1/30", "1/60", "1/90", "1/100", "1/125",
-    "1/180", "1/250", "1/350", "1/500", "1/720",
+    "1/1", "2/3", "1/2", "1/3", "1/4", "1/6",
+    "1/8", "1/10", "1/15", "1/20", "1/30",
+    "1/50", "1/60", "1/90", "1/100", "1/125",
+    "1/180", "1/250", "1/350", "1/500", "1/725",
     "1/1000", "1/1500", "1/2000", "1/3000", "1/4000",
     "1/6000", "1/10000",
 };
 
+//50/25
 char* exposure_shutter2[] = {
-    "1/1", "1/2", "1/3", "1/6", "1/12",
-    "1/25", "1/50", "1/75", "1/100", "1/120",
-    "1/150", "1/215", "1/300", "1/420", "1/600",
+    "1/1", "2/3", "1/2", "1/3", "1/4", "1/6",
+    "1/8", "1/12", "1/15", "1/20", "1/25",
+    "1/30", "1/50", "1/60", "1/100", "1/120",
+    "1/150", "1/215", "1/300", "1/425", "1/600",
     "1/1000", "1/1250", "1/1750", "1/2500", "1/3500",
     "1/6000", "1/10000",
 };
 
+//24
+char* exposure_shutter3[] = {
+    "1/1", "2/3", "1/2", "1/3", "1/4", "1/6", //6
+    "1/8", "1/12", "1/20", "1/24", "1/25",  //5
+    "1/40", "1/48", "1/50", "1/60", "1/96",  //5
+    "1/100", "1/120", "1/144", "1/192", "1/200", //5
+    "1/288", "1/400", "1/576", "1/1200", "1/2400", //5
+    "1/4800", "1/10000", // 2
+};
+
+
 int sonylens_exposure_shutter_get_count(void)
 {
-    return 22;
+    return 28;
 }
 int sonylens_exposure_shutter_get(void)
 {
@@ -3949,7 +3964,7 @@ void sonylens_exposure_shutter_set(int param)
     VISCA_result_e result = VISCA_result_ok;
     uint32 value = 0;
 
-    value = param;
+    value = param + 0x11;
     
     result = visca_set_exposure_shutter(sonylens_camera_id, value);
     if(result != VISCA_result_ok) {
@@ -3961,11 +3976,14 @@ char* sonylens_exposure_shutter_right(void)
 {
     switch(config_params.general.format)
     {
+        case 2:
+        case 11:
+            return exposure_shutter3[config_params.exposure.shutter];
         case 1:
-		case 3:
-		case 5:
-		case 7:
-		case 9:
+		case 4:
+		case 6:
+		case 8:
+		case 10:
             return exposure_shutter2[config_params.exposure.shutter];
         default:
             return exposure_shutter[config_params.exposure.shutter];
@@ -3975,13 +3993,15 @@ char* sonylens_exposure_shutter_right(void)
 
 
 char* exposure_iris[] = {
-    "F14", "F11", "F9.6", "F8",
-    "F6.8", "F5.6", "F4.8", "F4", "F3.4",
-    "F2.8", "F2.4", "F2", "F1.6"
+    "F11",  "F10",  "F9.6", "F8.7", "F8",
+    "F7.3", "F6.8", "F6.2", "F5.6", "F5.2",
+    "F4.8", "F4.4", "F4",   "F3.7", "F3.4",
+    "F3.1", "F2.8", "F2.6", "F2.4", "F2.2",
+    "F2",
 };
 int sonylens_exposure_iris_get_count(void)
 {
-    return 13;
+    return 21;
 }
 int sonylens_exposure_iris_get(void)
 {
@@ -5861,8 +5881,11 @@ void sonylens_menu_exit_yes() {
         if(VISCA_result_ok != result) {
             printf("\r\n L:%d result:%d", __LINE__, result);
         }
-
-        video_enable(false);
+        Wait10Ms(50);
+        system_reset();
+        //video_enable(false);
+        //Wait10Ms(20);
+        #if 0
         Wait10Ms(10);
         if((0 == config_params.general.format) || (1 == config_params.general.format))
         {
@@ -5874,8 +5897,10 @@ void sonylens_menu_exit_yes() {
         }
 
         Wait10Ms(10);
-    
-        video_enable(true);
+        #else
+        //sonylens_taskstate = SONY_GET_MONITOR_MODE;
+        #endif
+        //video_enable(true);
     }
 }
 void sonylens_menu_exit_no() {
@@ -5975,7 +6000,7 @@ void sonylens_set_zoom_stop()
 
 void sonylens_zoom_ratio_display(char * title)
 {
-    sony_ui_set_title(0xA, NULL, title, NULL);
+    sony_ui_set_title(0xA, " ", title, NULL);
     sony_ui_display_line(0xA, true);
     zoom_ratio_display = true;
     zoom_ratio_display_time = GetSysTick_10Ms();
@@ -6235,6 +6260,7 @@ void sonylens_iris_set(uint8 param)
 
 void sonylens_get_mode_info(void)
 {
+    #if 0
     uint8 ae_mode = mode_manager.exposure_mode;
     uint8 wb_mode = mode_manager.wb_mode;
     if((1 == ae_mode) && (1 == wb_mode))
@@ -6245,40 +6271,46 @@ void sonylens_get_mode_info(void)
     {
         current_auto_mode = true;
     }
+    #else
+    if((0 == config_params.exposure.ae_mode))
+    {
+        current_auto_mode = true;
+    }
+    else
+    {
+        current_auto_mode = false;
+    }
+    #endif
 }
 
 void sonylens_set_auto_mode(bool enable)
 {
     if(enable)
     {
-        sonylens_key_wb_mode_set(0);
+        sonylens_wb_mode_set(0);
         
-        sonylens_key_exposure_ae_mode_set(0);
+        sonylens_exposure_ae_mode_set(0);
 
-        sonylens_key_advance_expcomp_on(true);
+        sonylens_advance_expcomp_on(true);
 
-        sonylens_key_advance_expcomp_set(mode_manager.expcomp);
+        sonylens_advance_expcomp_set(config_params.advance.expcomp);
 
         sonylens_tips_display(mode_tips[0]);
     }
     else
     {
-        sonylens_key_wb_mode_set(1);
+        sonylens_wb_mode_set(3);
         
-        sonylens_key_exposure_ae_mode_set(1);
+        sonylens_exposure_ae_mode_set(2);
 
-        sonylens_key_exposure_iris_set(mode_manager.iris);
+        sonylens_exposure_shutter_set(config_params.exposure.shutter);
 
-        sonylens_key_exposure_shutter_set(config_params.exposure.shutter);
-
-        // iris
-        //sonylens_exposure_iris_set(config_params.exposure.iris);
+        sonylens_exposure_iris_set(config_params.exposure.iris);
 
         // gain
-        sonylens_key_exposure_gain_set(key_exp_gain);
+        sonylens_exposure_gain_set(config_params.exposure.gain);
         
-        
-        sonylens_key_advance_expcomp_on(false);
+        sonylens_advance_expcomp_on(false);
         
         sonylens_tips_display(mode_tips[1]);
     }
@@ -6291,7 +6323,6 @@ void sonylens_set_auto_mode(bool enable)
 bool sonylens_get_auto_mode(void)
 {
     sonylens_get_mode_info();
-
     return current_auto_mode;
 }
 
@@ -6564,7 +6595,7 @@ void sonylens_tips_display(char * title)
     {
         return;
     }
-    sony_ui_set_title(0xA, NULL, title, NULL);
+    sony_ui_set_title(0xA, " ", title, NULL);
     sony_ui_display_line(0xA, true);
     tips_display = true;
     tips_display_time = GetSysTick_10Ms();
@@ -6799,8 +6830,8 @@ void sonylens_task(void)
         {
             if(keying_time > 500)
             {
-                printf("\r\n set format to 1080P25");
-                config_params.general.format = 6; // 720P25
+                printf("\r\n set format to 4K25");
+                config_params.general.format = 1; // 4K25
                 sonylens_write_config_params(&config_params);
                 sonylens_taskstate = SONY_VISCA_INIT;
             }
@@ -6809,8 +6840,8 @@ void sonylens_task(void)
         {
             if(keying_time > 500)
             {
-                printf("\r\n set format to 1080P60");
-                config_params.general.format = 3; // 1080P25
+                printf("\r\n set format to 1080P25");
+                config_params.general.format = 6; // 1080P25
                 sonylens_write_config_params(&config_params);
                 sonylens_taskstate = SONY_VISCA_INIT;
             }
