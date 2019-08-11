@@ -241,7 +241,7 @@ unsigned long sonylens_send_msg_time = 0;  ////µ•Œª√Î
 #define SONYLENS_10_S_DELAY  (10)
 unsigned long sonylens_task1_completion_time;
 
-const char version[SONYLENS_VERSION_SIZE] = "JY1905";
+const char version[SONYLENS_VERSION_SIZE] = "JY1903";
 const CONFIG_PARAMS_t default_config_params = {
     0, 1,
     {// zoom
@@ -302,7 +302,7 @@ const CONFIG_PARAMS_t default_config_params = {
     
     {// general
         {0, 0}, // camera{id, display}
-        3, //format
+        1, //format
         0, //lr_hand
         0, //protocol
         0, //baudrate
@@ -3528,7 +3528,7 @@ void sonylens_key_handle_process(void)
 
     if(key_is_pressed(KEY_ID_F3))
     {
-        sonylens_control_f3();
+        //sonylens_control_f3();
         return;
     }
 

@@ -20,7 +20,7 @@ const u8 TEXT_Buffer[]={"WarShipSTM32 IIC TEST"};
 #define SIZE sizeof(TEXT_Buffer)
 #endif
 
-int at24cxx_type = AT24C64;
+int at24cxx_type = AT24C64;//AT24C16
 u8 at24cxx_addr = 0xA0;
 
 
@@ -32,7 +32,7 @@ void AT24CXX_Init(void)
     u8 datatemp[SIZE];
     #endif
     
-    at24cxx_type = AT24C64;
+    at24cxx_type = AT24C16;
     at24cxx_addr = 0xA0;
 
     #if AT24CXX_DEBUG

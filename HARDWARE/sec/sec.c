@@ -3,7 +3,7 @@
 
 
 static u8 sec_code[4]; // 
-const u32 sec_code_holder = 0x67B0C7B0; //ng:0x877A67C4; //ok:0x87716773
+const u32 sec_code_holder = 0x65A61B1E; //ng:0x877A67C4; //ok:0x87716773
 BOOL sec_init(void)
 {
 	u32 cid[3];

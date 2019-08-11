@@ -28,10 +28,10 @@ KEY_INFO_t key_info_list[] = {
     {KEY_ID_U,  "UP",  GPIOA, GPIO_Pin_8,  KEY_STATE_UP, 0, 0},
     {KEY_ID_F1, "F1",  GPIOC, GPIO_Pin_13,  KEY_STATE_UP, 0, 0},
     {KEY_ID_F2, "F2",  GPIOC, GPIO_Pin_14,  KEY_STATE_UP, 0, 0},
-    {KEY_ID_F3, "F3",  GPIOC, GPIO_Pin_15,  KEY_STATE_UP, 0, 0},
+    {KEY_ID_F3, "F3",  GPIOB, GPIO_Pin_5,  KEY_STATE_UP, 0, 0},
     {KEY_ID_F4, "F4",  GPIOA, GPIO_Pin_0,  KEY_STATE_UP, 0, 0},
     {KEY_ID_F5, "F5",  GPIOA, GPIO_Pin_1,  KEY_STATE_UP, 0, 0},
-    {KEY_ID_F6, "F6",  GPIOB, GPIO_Pin_5,  KEY_STATE_UP, 0, 0},
+    {KEY_ID_F6, "F6",  GPIOC, GPIO_Pin_15,  KEY_STATE_UP, 0, 0},
     {KEY_ID_F7, "F7",  GPIOB, GPIO_Pin_8,  KEY_STATE_UP, 0, 0},
     {KEY_ID_F8, "F8",  GPIOB, GPIO_Pin_9,  KEY_STATE_UP, 0, 0},
 };
