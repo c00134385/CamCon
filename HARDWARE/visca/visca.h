@@ -167,6 +167,13 @@ VISCA_result_e visca_set_advance_expcomp(int address, uint8 value);
 
 VISCA_result_e visca_get_advance_expcomp_value(int address, uint32 *value);
 VISCA_result_e visca_set_advance_expcomp_value(int address, uint32 value);
+VISCA_result_e visca_expcomp_reset(int address);
+VISCA_result_e visca_expcomp_up(int address);
+VISCA_result_e visca_expcomp_down(int address);
+
+
+VISCA_result_e visca_get_WDMode(int address, uint8 *value);
+VISCA_result_e visca_set_WDMode(int address, uint8 value);
 
 VISCA_result_e visca_get_advance_wdr(int address, uint8 *value);
 VISCA_result_e visca_set_advance_wdr(int address, uint8 value);

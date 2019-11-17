@@ -76,8 +76,24 @@ typedef enum SONY_STATE{
 	SONY_SEND_QUERY,
 	SONY_ERROR,
 	SONY_FINISHED,
+
+    FUNC_TEST,
+
+    WDMode_INQ,
+    WDMode_SET,
+
+    AE_INQ,
+    AE_ON,
+    AE_SET,
+
+    ExpComp_ON,
+    ExpComp_OFF,
+    ExpComp_RESET,
+    ExpComp_INQ,
+    ExpComp_DIRECT,
+    
     //
-	MODEM_HW_ERROR = 100,
+	MODEM_HW_ERROR = 255,
 } SONY_STATE_E;
 
 typedef enum SONY_CMD_STATE {

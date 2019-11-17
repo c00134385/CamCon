@@ -4374,7 +4374,6 @@ void sonylens_advance_expcomp_set(int param)
     if(result != VISCA_result_ok) {
         return;
     }
-
    
     config_params.advance.expcomp = param;
     
@@ -7042,7 +7041,62 @@ void sonylens_task(void)
         #endif
 		
 		break;
+
+    case FUNC_TEST:
+        Wait10Ms(500);
+        sonylens_taskstate = AE_SET;
+        break;
+    case AE_SET:
+        {
+            VISCA_result_e result = VISCA_result_ok;
+            result = visca_set_exposure_ae_mode(sonylens_camera_id, 3);
+        }
+        sonylens_taskstate = AE_INQ;
+        break;
+        
+    case AE_INQ:
+        {
+            VISCA_result_e result = VISCA_result_ok;
+            result = visca_get_exposure_ae_mode(sonylens_camera_id, &value);
+        }
+        sonylens_taskstate = ExpComp_ON;
+        break;
+    
+    case ExpComp_ON:
+        {
+            VISCA_result_e result = VISCA_result_ok;
+            result = visca_set_advance_expcomp(sonylens_camera_id, 0x02);
+        }
+        sonylens_taskstate = ExpComp_INQ;
+        break;
+    
+    case ExpComp_INQ:
+        {
+            VISCA_result_e result = VISCA_result_ok;
+            result = visca_get_advance_expcomp(sonylens_camera_id, &value);
+        }
+        sonylens_taskstate = WDMode_INQ;
+        break;
+
+    case WDMode_INQ:
+        {
+            VISCA_result_e result = VISCA_result_ok;
+            result = visca_get_WDMode(sonylens_camera_id, &value);
+        }
+        sonylens_taskstate = ExpComp_RESET;
+        break;
+    case ExpComp_RESET:
+        {
+            VISCA_result_e result = VISCA_result_ok;
+            result = visca_expcomp_reset(sonylens_camera_id);
+            if(result != VISCA_result_ok) {
+                //return;
+            }
+        }
+        sonylens_taskstate = SONY_IDLE_2;
+        break;
     case SONY_IDLE_2:
+        
         break;
 	default:
 		break;

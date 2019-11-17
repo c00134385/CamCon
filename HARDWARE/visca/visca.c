@@ -46,8 +46,6 @@ VISCA_result_e g_result = VISCA_result_ok;
 unsigned long visca_start_time = 0;
 
 
-
-
 /* internal */
 void visca_print(unsigned char* msg, int len) {
     int i = 0;
@@ -110,7 +108,6 @@ bool visca_is_ack_completion(unsigned char* data, int len) {
     return result;
 }
 
-
 bool visca_is_network_change(unsigned char* data, int len) {
     bool result = true;
     int i = 0;
@@ -142,7 +139,6 @@ bool visca_is_command_not_executable(unsigned char* data, int len) {
     }
     return result;
 }
-
 
 bool visca_is_reply(unsigned char* src, int src_len, unsigned char* dst, int dst_len) {
     bool result = true;
@@ -286,6 +282,19 @@ void visca_print_response(void) {
     }
 }
 
+VISCA_result_e visca_handle_result(unsigned char* data, int len) {
+    VISCA_result_e ret = VISCA_result_unknown;
+    //visca_print_response();
+    visca_print(input_buf, input_buf_index);
+    if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
+        ret = VISCA_result_ok;
+    } else if(visca_is_inq_result(input_buf, input_buf_index)) {
+        ret = VISCA_result_ok;
+    } else if(visca_is_command_not_executable(input_buf, input_buf_index)) {
+        ret = VISCA_result_command_not_executable;
+    }
+    return ret;
+}
 
 void visca_send_packet(VISCA_packet_t *packet) {
     visca_print_packet(packet);
@@ -2039,26 +2048,25 @@ VISCA_result_e visca_get_exposure_ae_mode(int address, uint8 *mode) {
     visca_send_packet(&packet);
     visca_set_state(VISCA_state_wait_result);
 
-    printf("\r\n get exposure_ae?");
-
+    printf("\r\n %s?", __FUNCTION__);
+    
     while(true) {
         Wait10Ms(1);
         if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
-            if(visca_is_inq_result(input_buf, input_buf_index)) {
-                printf("\r\n get exposure_ae done.0x%02x", input_buf[2]);
+            ret = visca_handle_result(input_buf, input_buf_index);
+            if(VISCA_result_ok == ret) {
                 *mode = input_buf[2];
-                ret = VISCA_result_ok;
-                break;
-            } else {
-                ret = VISCA_result_fail;
-                break;
             }
+            break;
         } else if(visca_is_no_response()){
             visca_print(input_buf, input_buf_index);
             ret = VISCA_result_no_response;
             break;
         }
     }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
+    visca_set_state(VISCA_state_idle);
+    return ret;
 }
 VISCA_result_e visca_set_exposure_ae_mode(int address, uint8 mode) {
     VISCA_result_e ret = VISCA_result_unknown;
@@ -2076,26 +2084,20 @@ VISCA_result_e visca_set_exposure_ae_mode(int address, uint8 mode) {
     visca_send_packet(&packet);
     visca_set_state(VISCA_state_wait_ack);
 
-    printf("\r\n set exposure_ae_mode?");
+    printf("\r\n %s?", __FUNCTION__);
 
     while(true) {
         Wait10Ms(1);
-        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
-            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
-                printf("\r\n set exposure_ae_mode done!");
-                ret = VISCA_result_ok;
-                break;
-            } else {
-                visca_print(input_buf, input_buf_index);
-                ret = VISCA_result_fail;
-                break;
-            }
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            break;
         } else if(visca_is_no_response()){
             visca_print(input_buf, input_buf_index);
             ret = VISCA_result_no_response;
             break;
         }
     }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
 
     visca_set_state(VISCA_state_idle);
     return ret;
@@ -2644,7 +2646,38 @@ VISCA_result_e visca_set_advance_blc(int address, uint8 value) {
 }
 
 VISCA_result_e visca_get_advance_expcomp_value(int address, uint32 *value) {
-    VISCA_result_e ret = VISCA_result_ok;
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_INQUIRY);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x4E);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+        
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_result);
+
+    printf("\r\n %s?", __FUNCTION__);
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            if(VISCA_result_ok == ret) {
+                *value = (input_buf[input_buf_index - 3] << 4) + input_buf[input_buf_index - 2];
+            }
+            break;
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
+    visca_set_state(VISCA_state_idle);
     return ret;
 }
 VISCA_result_e visca_set_advance_expcomp_value(int address, uint32 value) {
@@ -2667,33 +2700,163 @@ VISCA_result_e visca_set_advance_expcomp_value(int address, uint32 value) {
     visca_send_packet(&packet);
     visca_set_state(VISCA_state_wait_ack);
 
-    printf("\r\n set advance_expcomp?");
+    printf("\r\n %s?", __FUNCTION__);
 
     while(true) {
         Wait10Ms(1);
-        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
-            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
-                printf("\r\n set advance_expcomp done!");
-                ret = VISCA_result_ok;
-                break;
-            } else {
-                visca_print(input_buf, input_buf_index);
-                ret = VISCA_result_fail;
-                break;
-            }
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            break;
         } else if(visca_is_no_response()){
             visca_print(input_buf, input_buf_index);
             ret = VISCA_result_no_response;
             break;
         }
     }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
+
+    visca_set_state(VISCA_state_idle);
+    return ret;
+}
+
+VISCA_result_e visca_expcomp_reset(int address) {
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_COMMAND);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x0E);
+    visca_append_byte(&packet, 0);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+    
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_ack);
+
+    printf("\r\n %s?", __FUNCTION__);
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            break;
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
+
+    visca_set_state(VISCA_state_idle);
+    return ret;
+}
+
+VISCA_result_e visca_expcomp_up(int address) {
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_COMMAND);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x0E);
+    visca_append_byte(&packet, 0x02);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+    
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_ack);
+
+    printf("\r\n %s?", __FUNCTION__);
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            break;
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
+
+    visca_set_state(VISCA_state_idle);
+    return ret;
+}
+
+VISCA_result_e visca_expcomp_down(int address) {
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_COMMAND);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x0E);
+    visca_append_byte(&packet, 0x03);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+    
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_ack);
+
+    printf("\r\n %s?", __FUNCTION__);
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            break;
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
 
     visca_set_state(VISCA_state_idle);
     return ret;
 }
 
 VISCA_result_e visca_get_advance_expcomp(int address, uint8 *value) {
-    VISCA_result_e ret = VISCA_result_ok;
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_INQUIRY);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x3E);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+        
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_result);
+
+    printf("\r\n %s?", __FUNCTION__);
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            if(VISCA_result_ok == ret) {
+                *value = input_buf[2];
+            }
+            break;
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
+    visca_set_state(VISCA_state_idle);
     return ret;
 }
 VISCA_result_e visca_set_advance_expcomp(int address, uint8 value) {
@@ -2713,26 +2876,91 @@ VISCA_result_e visca_set_advance_expcomp(int address, uint8 value) {
     visca_send_packet(&packet);
     visca_set_state(VISCA_state_wait_ack);
 
-    printf("\r\n set advance_expcomp?");
+    printf("\r\n %s?", __FUNCTION__);
 
     while(true) {
         Wait10Ms(1);
-        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
-            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
-                printf("\r\n set advance_expcomp done!");
-                ret = VISCA_result_ok;
-                break;
-            } else {
-                visca_print(input_buf, input_buf_index);
-                ret = VISCA_result_fail;
-                break;
-            }
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            break;
         } else if(visca_is_no_response()){
             visca_print(input_buf, input_buf_index);
             ret = VISCA_result_no_response;
             break;
         }
     }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
+
+    visca_set_state(VISCA_state_idle);
+    return ret;
+}
+
+VISCA_result_e visca_get_WDMode(int address, uint8 *value) {
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_INQUIRY);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x3D);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+        
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_result);
+
+    printf("\r\n %s?", __FUNCTION__);
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            if(VISCA_result_ok == ret) {
+                *value = input_buf[2];
+            }
+            break;
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
+    visca_set_state(VISCA_state_idle);
+    return ret;
+}
+
+VISCA_result_e visca_set_WDMode(int address, uint8 value) {
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_COMMAND);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x3D);
+    visca_append_byte(&packet, (value & 0xFF));
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+    
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_ack);
+
+    printf("\r\n %s?", __FUNCTION__);
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            break;
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
 
     visca_set_state(VISCA_state_idle);
     return ret;
@@ -2929,27 +3157,20 @@ VISCA_result_e visca_set_image_aperture(int address, uint8 value) {
     visca_send_packet(&packet);
     visca_set_state(VISCA_state_wait_ack);
 
-    printf("\r\n set image_aperture?");
-
+    printf("\r\n %s?", __FUNCTION__);
+    
     while(true) {
         Wait10Ms(1);
-        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
-            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
-                printf("\r\n set image_aperture done!");
-                ret = VISCA_result_ok;
-                break;
-            } else {
-                visca_print(input_buf, input_buf_index);
-                ret = VISCA_result_fail;
-                break;
-            }
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            break;
         } else if(visca_is_no_response()){
             visca_print(input_buf, input_buf_index);
             ret = VISCA_result_no_response;
             break;
         }
     }
-
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
     visca_set_state(VISCA_state_idle);
     return ret;
 }
@@ -2977,27 +3198,20 @@ VISCA_result_e visca_set_image_color_gain(int address, uint8 value) {
     visca_send_packet(&packet);
     visca_set_state(VISCA_state_wait_ack);
 
-    printf("\r\n set image color_gain?");
-
+    printf("\r\n %s?", __FUNCTION__);
+    
     while(true) {
         Wait10Ms(1);
-        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
-            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
-                printf("\r\n set image color_gain done!");
-                ret = VISCA_result_ok;
-                break;
-            } else {
-                visca_print(input_buf, input_buf_index);
-                ret = VISCA_result_fail;
-                break;
-            }
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            break;
         } else if(visca_is_no_response()){
             visca_print(input_buf, input_buf_index);
             ret = VISCA_result_no_response;
             break;
         }
     }
-
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
     visca_set_state(VISCA_state_idle);
     return ret;
 }
@@ -3025,27 +3239,20 @@ VISCA_result_e visca_set_image_color_hue(int address, uint8 value) {
     visca_send_packet(&packet);
     visca_set_state(VISCA_state_wait_ack);
 
-    printf("\r\n set image color_hue?");
-
+    printf("\r\n %s?", __FUNCTION__);
+    
     while(true) {
         Wait10Ms(1);
-        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
-            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
-                printf("\r\n set image color_hue done!");
-                ret = VISCA_result_ok;
-                break;
-            } else {
-                visca_print(input_buf, input_buf_index);
-                ret = VISCA_result_fail;
-                break;
-            }
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            ret = visca_handle_result(input_buf, input_buf_index);
+            break;
         } else if(visca_is_no_response()){
             visca_print(input_buf, input_buf_index);
             ret = VISCA_result_no_response;
             break;
         }
     }
-
+    printf("\r\n %s done. ret:%d", __FUNCTION__, ret);
     visca_set_state(VISCA_state_idle);
     return ret;
 }
