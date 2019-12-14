@@ -241,7 +241,7 @@ unsigned long sonylens_send_msg_time = 0;  ////µ•Œª√Î
 #define SONYLENS_10_S_DELAY  (10)
 unsigned long sonylens_task1_completion_time;
 
-const char version[SONYLENS_VERSION_SIZE] = "JY1901";
+const char version[SONYLENS_VERSION_SIZE] = "JY1912";
 const CONFIG_PARAMS_t default_config_params = {
     0, 1,
     {// zoom
@@ -1390,6 +1390,8 @@ void sonylens_init(void) {
 
 	// power on camera after the eeprom data is ready;
 	video_enable(true);
+
+    Wait10Ms(300);
 	
     sony_ui_init();
 
