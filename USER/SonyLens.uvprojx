@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_MD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\IIC;..\HARDWARE\AT24CXX;..\HARDWARE\SONYLENS;..\HARDWARE\INC;..\HARDWARE\visca;..\HARDWARE\key;..\HARDWARE\lt8618sx;..\HARDWARE\mpr121;..\HARDWARE\EXTI;..\HARDWARE\visca_p;..\HARDWARE\pelco_d;..\HARDWARE\UART;..\HARDWARE\string;..\HARDWARE\STMFLASH</IncludePath>
+              <IncludePath>..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\IIC;..\HARDWARE\AT24CXX;..\HARDWARE\SONYLENS;..\HARDWARE\INC;..\HARDWARE\visca;..\HARDWARE\key;..\HARDWARE\lt8618sx;..\HARDWARE\mpr121;..\HARDWARE\EXTI;..\HARDWARE\visca_p;..\HARDWARE\pelco_d;..\HARDWARE\UART;..\HARDWARE\string;..\HARDWARE\STMFLASH;..\HARDWARE\remote</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -660,6 +660,11 @@
               <FileName>cam_test.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\SONYLENS\cam_test.c</FilePath>
+            </File>
+            <File>
+              <FileName>remote.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\remote\remote.c</FilePath>
             </File>
           </Files>
         </Group>

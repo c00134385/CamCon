@@ -5,6 +5,7 @@
 #include "myiic.h"
 #include "at24cxx.h"
 #include "cam_test.h"
+#include "remote.h"
 #include "includes.h"
 
 /* version */
@@ -80,6 +81,8 @@ int main(void)
 	u32 zoom_value;
     BOOL cam_initialized = false;
 	VISCA_result_e result;
+    u8 lastKey = 0;
+    u8 lastKeyCnt = 0;
         
 	delay_init();	    	 //???????	  
 	NVIC_Configuration(); 	 //??NVIC????2:2??????,2??????
@@ -103,6 +106,24 @@ int main(void)
 			delay_ms(250);
 		}
 	}
+
+    Remote_Init();
+	
+    #if 0
+    // remote test code
+	while(1)
+	{
+        u8 key = Remote_Scan();
+        u8 keyCnt = RmtCnt;
+        
+		if(key != lastKey || keyCnt != lastKeyCnt)
+		{
+			printf("\r\n key:%x RmtCnt:%d", key, RmtCnt);
+            lastKey = key;
+            lastKeyCnt = keyCnt;
+		}
+	}
+    #endif
 	
 
 	printf(version_msg);
@@ -130,16 +151,79 @@ int main(void)
 	
 	while(1)
 	{
-		
-		#if 0
-		if( GetSysTick_Sec() > (main_task_t_sec) )
-	    {
-	        main_task_t_sec = GetSysTick_Sec();
-	        //printf("time_sec:%d msec:%ld \r\n",GetSysTick_Sec(),GetSysTick_10Ms());
-			sonylens_get_zoom_value(&zoom_value);
-			printf("\r\nzoom_value:0x%x",zoom_value);
-	    }
-		#endif
+        u8 key = Remote_Scan();
+        u8 keyCnt = RmtCnt;
+        bool updateKey = true;
+        
+		if(key != lastKey)
+		{
+			//printf("\r\n key:%x RmtCnt:%d", key, RmtCnt);
+            
+            switch(key)
+			{
+				case 0x80://menu
+				    sonylens_remote_navi_ok();
+                    break;
+                case 0xa0://zoom +
+                    if(sonylens_remote_is_menu_on())
+                    {
+                        sonylens_remote_navi_left();
+                    }
+                    else
+                    {
+                        sonylens_set_zoom_tele();
+                    }
+                    break;
+                case 0xd8://zoom -
+                    if(sonylens_remote_is_menu_on())
+                    {
+                        sonylens_remote_navi_right();
+                    }
+                    else
+                    {
+                        sonylens_set_zoom_wide();
+                    }
+                    break;
+                case 0xc0://focus +
+                    if(sonylens_remote_is_menu_on())
+                    {
+                        sonylens_remote_navi_down();
+                    }
+                    else
+                    {
+                        sonylens_set_focus_near();
+                    }
+                    
+                    break;
+                case 0xe0://focus -
+                    if(sonylens_remote_is_menu_on())
+                    {
+                        sonylens_remote_navi_up();
+                    }
+                    else
+                    {
+                        sonylens_set_focus_far();
+                    }
+                    break;
+                case 0x50://light +
+                    sonylens_control_f5();
+                    break;
+                case 0xf8://light -
+                    sonylens_control_f6();
+                    break;
+                case 0x90://mode
+                    sonylens_control_f7();
+                    break;
+                case 0:
+                    sonylens_set_zoom_stop();
+                    sonylens_set_focus_stop();
+                    break;
+			}
+            if(updateKey) {
+                lastKey = key;
+                lastKeyCnt = keyCnt;
+            }
+		}
 
 		sonylens_task();
 	}
