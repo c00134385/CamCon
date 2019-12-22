@@ -1463,10 +1463,10 @@ void sonylens_wb_init(void)
     if(1 == config_params.wb.wb_mode)
     {
         // red gain
-        sonylens_wb_red_gain_set(config_params.wb.red_gain);
+        //sonylens_wb_red_gain_set(config_params.wb.red_gain);
 
         // blue gain
-        sonylens_wb_blue_gain_set(config_params.wb.blue_gain);
+        //sonylens_wb_blue_gain_set(config_params.wb.blue_gain);
     }
 }
 
@@ -6943,7 +6943,7 @@ void sonylens_task(void)
         visca_result = visca_set_title_clear(sonylens_camera_id, 0xF);
         if(VISCA_result_ok == visca_result) {
             titles_clear_done = true;
-            sonylens_taskstate = SONY_INIT_CONFIG;
+            sonylens_taskstate = SONY_IDLE;
         }
         else
         {
@@ -7003,12 +7003,14 @@ void sonylens_task(void)
             break;
         }
         
-        // check zoom ratio
+        // check zoom ratio 
+        #if 0
         if(!zoom_ratio_set_done)
         {
             sonylens_taskstate = SONY_SET_ZOOM_RATIO;
             break;
-        }
+        } 
+        #endif
 
         // display splash titles
         if(!splash_set_done)
