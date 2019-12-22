@@ -79,7 +79,7 @@ int main(void)
         
 		if(key != lastKey || keyCnt != lastKeyCnt)
 		{
-			printf("\r\n key:%x RmtCnt:%d", key, RmtCnt);
+			printf("\r\n key:%x(%d) RmtCnt:%d", key, key, RmtCnt);
             lastKey = key;
             lastKeyCnt = keyCnt;
 		}
@@ -124,7 +124,7 @@ int main(void)
 				case 0x80://menu
 				    sonylens_remote_navi_ok();
                     break;
-                case 0xa0://zoom +
+                case 0xa8://zoom +
                     if(sonylens_remote_is_menu_on())
                     {
                         sonylens_remote_navi_left();
@@ -134,7 +134,7 @@ int main(void)
                         sonylens_set_zoom_tele();
                     }
                     break;
-                case 0xd8://zoom -
+                case 0x18://zoom -
                     if(sonylens_remote_is_menu_on())
                     {
                         sonylens_remote_navi_right();
@@ -164,13 +164,13 @@ int main(void)
                         sonylens_set_focus_near();
                     }
                     break;
-                case 0x50://light +
+                case 0x4a://light +
                     sonylens_control_f5();
                     break;
-                case 0xf8://light -
+                case 0xe8://light -
                     sonylens_control_f6();
                     break;
-                case 0x90://mode
+                case 0xe2://mode
                     sonylens_control_f7();
                     break;
                 case 0:

@@ -25,9 +25,7 @@ void Remote_Init(void)
 	TIM_ICInitTypeDef  TIM_ICInitStructure;  
  
  	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_AFIO,ENABLE); //使能PORTB时钟 
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE);
-
-    //TIM_ClearITPendingBit(TIM1, TIM_IT_Update );     //清除TIM1更新中断标志
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE); 
     
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;				 //PB9 输入 
@@ -73,68 +71,7 @@ void Remote_Init(void)
 u8 	RmtSta=0;	  	  
 u16 Dval;		//下降沿时计数器的值
 u32 RmtRec=0;	//红外接收到的数据	   		    
-u8  RmtCnt=0;	//按键按下的次数	  
-
-//定时器2中断服务程序	 
-void TIM4_IRQHandler(void)
-{
-    //printf("\r\n TIM4_IRQHandler");
-    if(TIM_GetITStatus(TIM4,TIM_IT_Update)!=RESET)
-	{
-		if(RmtSta&0x80)//上次有数据被接收到了
-		{	
-			RmtSta&=~0X10;						//取消上升沿已经被捕获标记
-			if((RmtSta&0X0F)==0X00)RmtSta|=1<<6;//标记已经完成一次按键的键值信息采集
-			if((RmtSta&0X0F)<14)RmtSta++;
-			else
-			{
-				RmtSta&=~(1<<7);//清空引导标识
-				RmtSta&=0XF0;	//清空计数器	
-			}						 	   	
-		}							    
-	}
- 	if(TIM_GetITStatus(TIM4,TIM_IT_CC4)!=RESET)
-	{	  
-		if(RDATA)//上升沿捕获
-		{
-
-			TIM_OC4PolarityConfig(TIM4,TIM_ICPolarity_Falling);		//CC1P=1 设置为下降沿捕获				
-	    	TIM_SetCounter(TIM4,0);	   	//清空定时器值
-			RmtSta|=0X10;					//标记上升沿已经被捕获
-		}else //下降沿捕获
-		{			
-  			 Dval=TIM_GetCapture4(TIM4);//读取CCR1也可以清CC1IF标志位
-			 TIM_OC4PolarityConfig(TIM4,TIM_ICPolarity_Rising); //CC4P=0	设置为上升沿捕获
- 			
-			if(RmtSta&0X10)					//完成一次高电平捕获 
-			{
- 				if(RmtSta&0X80)//接收到了引导码
-				{
-					
-					if(Dval>300&&Dval<800)			//560为标准值,560us
-					{
-						RmtRec<<=1;	//左移一位.
-						RmtRec|=0;	//接收到0	   
-					}else if(Dval>1400&&Dval<1800)	//1680为标准值,1680us
-					{
-						RmtRec<<=1;	//左移一位.
-						RmtRec|=1;	//接收到1
-					}else if(Dval>2200&&Dval<2600)	//得到按键键值增加的信息 2500为标准值2.5ms
-					{
-						RmtCnt++; 		//按键次数增加1次
-						RmtSta&=0XF0;	//清空计时器		
-					}
- 				}else if(Dval>4200&&Dval<4700)		//4500为标准值4.5ms
-				{
-					RmtSta|=1<<7;	//标记成功接收到了引导码
-					RmtCnt=0;		//清除按键次数计数器
-				}						 
-			}
-			RmtSta&=~(1<<4);
-		}				 		     	    					   
-	}
- TIM_ClearFlag(TIM4,TIM_IT_Update|TIM_IT_CC4);	    
-}
+u8  RmtCnt=0;	//按键按下的次数	   
 
 void TIM3_IRQHandler(void) {
 
@@ -153,12 +90,9 @@ void TIM3_IRQHandler(void) {
 		}
         TIM_ClearFlag(TIM3,TIM_IT_Update);
 	}
-
-
     
  	if(TIM_GetITStatus(TIM3,TIM_IT_CC1)!=RESET)
 	{
-        
 		if(RDATA)//上升沿捕获
 		{
 			TIM_OC1PolarityConfig(TIM3,TIM_ICPolarity_Falling);		//CC1P=1 设置为下降沿捕获				
