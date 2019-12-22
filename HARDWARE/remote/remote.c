@@ -45,7 +45,7 @@ void Remote_Init(void)
 
 	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure); //根据指定的参数初始化TIMx
 
-  	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;  // 选择输入端 IC4映射到TI4上
+  	TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;  // 选择输入端 IC4映射到TI4上
   	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;	//上升沿捕获
   	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
   	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;	 //配置输入分频,不分频 
@@ -60,7 +60,7 @@ void Remote_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; //IRQ通道被使能
 	NVIC_Init(&NVIC_InitStructure);  //根据NVIC_InitStruct中指定的参数初始化外设NVIC寄存器	
 
-	TIM_ITConfig( TIM3,TIM_IT_Update|TIM_IT_CC2,ENABLE);//允许更新中断 ,允许CC4IE捕获中断								 
+	TIM_ITConfig( TIM3,TIM_IT_Update|TIM_IT_CC1,ENABLE);//允许更新中断 ,允许CC4IE捕获中断								 
 }
 
 
@@ -137,6 +137,7 @@ void TIM4_IRQHandler(void)
 }
 
 void TIM3_IRQHandler(void) {
+
     if(TIM_GetITStatus(TIM3,TIM_IT_Update)!=RESET)
 	{
 		if(RmtSta&0x80)//上次有数据被接收到了
@@ -150,18 +151,24 @@ void TIM3_IRQHandler(void) {
 				RmtSta&=0XF0;	//清空计数器	
 			}						 	   	
 		}
+        TIM_ClearFlag(TIM3,TIM_IT_Update);
 	}
- 	if(TIM_GetITStatus(TIM3,TIM_IT_CC2)!=RESET)
+
+
+    
+ 	if(TIM_GetITStatus(TIM3,TIM_IT_CC1)!=RESET)
 	{
+        
 		if(RDATA)//上升沿捕获
 		{
-			TIM_OC2PolarityConfig(TIM3,TIM_ICPolarity_Falling);		//CC1P=1 设置为下降沿捕获				
+			TIM_OC1PolarityConfig(TIM3,TIM_ICPolarity_Falling);		//CC1P=1 设置为下降沿捕获				
 	    	TIM_SetCounter(TIM3,0);	   	//清空定时器值
 			RmtSta|=0X10;					//标记上升沿已经被捕获
-		}else //下降沿捕获
+		}
+        else //下降沿捕获
 		{
-  			 Dval=TIM_GetCapture2(TIM3);//读取CCR1也可以清CC1IF标志位
-			 TIM_OC2PolarityConfig(TIM3,TIM_ICPolarity_Rising); //CC4P=0	设置为上升沿捕获
+  			 Dval=TIM_GetCapture1(TIM3);//读取CCR1也可以清CC1IF标志位
+			 TIM_OC1PolarityConfig(TIM3,TIM_ICPolarity_Rising); //CC4P=0	设置为上升沿捕获
 			if(RmtSta&0X10)					//完成一次高电平捕获 
 			{
  				if(RmtSta&0X80)//接收到了引导码
@@ -188,9 +195,9 @@ void TIM3_IRQHandler(void) {
 								 
 			}
 			RmtSta&=~(0x10);
-		}				 		     	    					   
+		}				 		 
+        TIM_ClearFlag(TIM3,TIM_IT_CC1);	
 	}
- TIM_ClearFlag(TIM3,TIM_IT_Update|TIM_IT_CC2);	   
 }
 
 
