@@ -162,9 +162,9 @@ void system_reset(void);
 
 void LED_Init();
 void LED_Enable(BOOL on);
+void gennum_enable(BOOL on);
 
-
-#if 0
+#if 1
 void gennum_reset(void);
 void gennum_reset_low(void);
 void gennum_reset_high(void);

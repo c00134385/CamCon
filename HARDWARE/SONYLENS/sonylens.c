@@ -6990,6 +6990,7 @@ void sonylens_task(void)
         #endif
         break;
     case SONY_SET_SPLASH:
+				gennum_reset_high();
         sonylens_splash_display();
         splash_set_done = true;
         sonylens_taskstate = SONY_IDLE;
@@ -7080,7 +7081,8 @@ void sonylens_task(void)
             result = visca_get_advance_expcomp(sonylens_camera_id, &value);
         }
         sonylens_taskstate = WDMode_INQ;
-        break;
+        break;
+
 
     case WDMode_INQ:
         {

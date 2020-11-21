@@ -75,6 +75,12 @@ void KEY_Init(void) //IO初始化
     GPIO_ResetBits(GPIOB,GPIO_Pin_1);
     GPIO_SetBits(GPIOB,GPIO_Pin_2);
     GPIO_SetBits(GPIOB,GPIO_Pin_4);
+		
+		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;	//PA5
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		 //推挽输出
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		 //IO口速度为50MHz
+    GPIO_Init(GPIOA, &GPIO_InitStructure);					 //根据设定参数初始化GPIOB.5
+    GPIO_ResetBits(GPIOA,GPIO_Pin_5);
 }
 //按键处理函数
 //返回按键值
@@ -414,23 +420,20 @@ void system_reset(void)
     SYSTEM_RESET = 0;
 }
 
-#if 0
+#if 1
 
 void gennum_reset(void)
 {
-    PBout(2) = 0;
-    Wait10Ms(50);
-    PBout(2) = 1;
 }
 
 void gennum_reset_low(void)
 {
-    PBout(2) = 0;
+    PAout(5) = 0;
 }
 
 void gennum_reset_high(void)
 {
-    PBout(2) = 1;
+    PAout(5) = 1;
 }
 #endif
 
@@ -455,9 +458,8 @@ void LED_Enable(BOOL on)
     }
     else
     {
-        WORK_LED = 0;
-    }
-    
-}
+        WORK_LED = 0;
 
+    }
+}
 
