@@ -25,7 +25,7 @@ unsigned long main_task_t_sec = 0;  ////µ•Œª√Î
 
 
 static u8 Lock_Code[4]; // 
-const u32 Lock_Code_Holder = 0x9136FB19;
+const u32 Lock_Code_Holder = 0x98B7CE2A;
 BOOL checkIdCode(void)
 {
 	u32 CpuID[3];
@@ -96,7 +96,7 @@ int main(void)
 	LED_Init();
     
 
-	//check = checkIdCode();
+	check = checkIdCode();
 	if(!check)
 	{
 		printf("%c", 64);

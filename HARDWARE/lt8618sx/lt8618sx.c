@@ -418,6 +418,7 @@ void LT8618SX_Video_Check( void )
 void LT8618SX_Initial( void )
 {
     u16 deviceId;
+	u8 value;
 
     lt8618_init = true;
    
@@ -435,140 +436,262 @@ void LT8618SX_Initial( void )
 
 	//I2CADR = LT8618SX_ADR;              // …Ë÷√IICµÿ÷∑
 
+/*
+76 ff 80 00
+76 11 00 00
+76 13 f1 00
+76 13 f9 00
+	*/
+
 	HDMI_WriteI2C_Byte( 0xff, 0x80 );// register bank
-	HDMI_WriteI2C_Byte( 0xee, 0x01 );
-
-//	HDMI_WriteI2C_Byte( 0xff, 0x80 );// register bank
 	HDMI_WriteI2C_Byte( 0x11, 0x00 ); //reset MIPI Rx logic.
-
+	HDMI_WriteI2C_Byte( 0x13, 0xf1 );
+	HDMI_WriteI2C_Byte( 0x13, 0xf9 );
+/*
+76 ff 81 00
+76 02 66 00
+76 0a 06 00
+76 15 06 00
+*/	
 	// TTL mode
 	HDMI_WriteI2C_Byte( 0xff, 0x81 );// register bank
 	HDMI_WriteI2C_Byte( 0x02, 0x66 );
 	HDMI_WriteI2C_Byte( 0x0a, 0x06 );
 	HDMI_WriteI2C_Byte( 0x15, 0x06 );
-
+/*
+76 4e a8 00
+*/
+	HDMI_WriteI2C_Byte( 0x4e, 0xa8 );
+	
+/*
+76 ff 82 00
+76 1b 77 00
+76 1c ec 00 *
+*/
 	// TTL_Input_Digtal
 	HDMI_WriteI2C_Byte( 0xff, 0x82 );// register bank
-	HDMI_WriteI2C_Byte( 0x45, _D8_D23_In );   //RGB channel swap
+	HDMI_WriteI2C_Byte( 0x1b, 0x77 );
+	HDMI_WriteI2C_Byte( 0x1c, 0xec );
 
-	if (Use_DDRCLK)
-		{
-		HDMI_WriteI2C_Byte(0x4f,0x80); // 0x80: dclk 
-		}
-	else
-		{
-		HDMI_WriteI2C_Byte(0x4f,0x00); // 0x40: txpll_clk 
-		}
 
+	//76 ff 80 00
+	//76 0a f0 00
+	HDMI_WriteI2C_Byte( 0xff, 0x80 );// register bank
+	HDMI_WriteI2C_Byte( 0x0a, 0xf0 );
+
+	
+	// digital
+/*
+76 ff 82 00
+76 45 70 00
+76 4f 40 00
+76 50 00 00
+76 51 42 00
+76 48 08 00
+76 47 01 ff
+76 47 07 00
+*/
+	HDMI_WriteI2C_Byte( 0xff, 0x82 );
+	HDMI_WriteI2C_Byte( 0x45, 0x70 );   //RGB channel swap
+	HDMI_WriteI2C_Byte( 0x4f, 0x40);
 	HDMI_WriteI2C_Byte( 0x50, 0x00 );
+	HDMI_WriteI2C_Byte( 0x51, 0x42 );
 	HDMI_WriteI2C_Byte( 0x48, 0x08 );   //Embedded sync mode input enable.
+	if(HDMI_ReadI2C_ByteN(0x47, (u8*)&value, sizeof(u8)))
+    {
+        printf("\r\nLT8618SX 0x47: 0x%02x.\r\n", value);
+    }
+	HDMI_WriteI2C_Byte( 0x47, 0x07 );
 	
 	Wait10Ms( 100 );
 	
-	LT8618SX_Video_Check( );
+	//LT8618SX_Video_Check( );
 
 	// PLL
+	/*
+76 ff 81 00
+76 23 40 00
+76 24 64 00
+76 26 55 00
+76 29 04 00
+76 25 01 00
+76 2c 94 00
+76 2d 99 00 // 74.25M
+	*/
 	HDMI_WriteI2C_Byte( 0xff, 0x81 );// register bank
 	HDMI_WriteI2C_Byte( 0x23, 0x40 );
 	HDMI_WriteI2C_Byte( 0x24, 0x64 ); //icp set
-//	HDMI_WriteI2C_Byte( 0x25, 0x05 );
-	HDMI_WriteI2C_Byte( 0x2c, 0x9e );
-	HDMI_WriteI2C_Byte( 0x2d, 0x88 );
-	HDMI_WriteI2C_Byte( 0x2e, 0x01 );
-	HDMI_WriteI2C_Byte( 0x2f, 0x00 );
 	HDMI_WriteI2C_Byte( 0x26, 0x55 );
-
-	if (Use_DDRCLK)
-		{
-		HDMI_WriteI2C_Byte(0x25,0x02);//0x02 //pre-divider3 ddr 02
-		HDMI_WriteI2C_Byte(0x27,0x66);//0x60 //ddr 0x66
-		}
-	else
-		{
-		HDMI_WriteI2C_Byte(0x25,0x05);//0x05 //pre-divider5 ddr 02
-		HDMI_WriteI2C_Byte(0x27,0x60);//0x60 //ddr 0x60
-		}
+	HDMI_WriteI2C_Byte( 0x29, 0x04 );
+	HDMI_WriteI2C_Byte( 0x25, 0x01 );
+	HDMI_WriteI2C_Byte( 0x2c, 0x94 );
+	HDMI_WriteI2C_Byte( 0x2d, 0x99 );
 
 
-	HDMI_WriteI2C_Byte( 0x28, 0x88 );
-//-------------------------------------------
-
-	// IIS Input
-	HDMI_WriteI2C_Byte( 0xff, 0x82 );// register bank
-	HDMI_WriteI2C_Byte( 0xd6, 0x8c );
-	HDMI_WriteI2C_Byte( 0xd7, 0x04 );   //sync polarity
-
-	HDMI_WriteI2C_Byte( 0xff, 0x84 );// register bank
-	HDMI_WriteI2C_Byte( 0x06, 0x08 );
-	HDMI_WriteI2C_Byte( 0x07, 0x10 );
-
-	HDMI_WriteI2C_Byte( 0x34, 0xd4 );   //CTS_N
-
-//-------------------------------------------
-/*      // SPDIF Input
-	HDMI_WriteI2C_Byte( 0xff, 0x82 );// register bank
-	HDMI_WriteI2C_Byte( 0xd6, 0x8c );
-	HDMI_WriteI2C_Byte( 0xd7, 0x04 );   //sync polarity
-
-	HDMI_WriteI2C_Byte( 0xff, 0x84 );// register bank
-	HDMI_WriteI2C_Byte( 0x06, 0x0c );
-	HDMI_WriteI2C_Byte( 0x07, 0x10 );
-
-	HDMI_WriteI2C_Byte( 0x34, 0xd4 );//CTS_N
+/*
+76 4d 00 00
+76 27 60 00
+76 28 00 00
 */
-//------------------------------------------- 
+	HDMI_WriteI2C_Byte( 0x4d, 0x00 );
+	HDMI_WriteI2C_Byte( 0x27, 0x60 );
+	HDMI_WriteI2C_Byte( 0x28, 0x00 );
 
-	// color space config
-	HDMI_WriteI2C_Byte( 0xff, 0x82 );// register bank
-//	HDMI_WriteI2C_Byte( 0xb9, 0x08 );// YCbCr444 to RGB
-	HDMI_WriteI2C_Byte( 0xb9, 0x18 );// YCbCr422 to RGB
-//	HDMI_WriteI2C_Byte( 0xb9, 0x00 );// No csc
+	if(HDMI_ReadI2C_ByteN(0x2b, (u8*)&value, sizeof(u8)))
+    {
+        printf("\r\nLT8618SX 0x2b: 0x%02x.\r\n", value);
+    }
+	if(HDMI_ReadI2C_ByteN(0x2e, (u8*)&value, sizeof(u8)))
+    {
+        printf("\r\nLT8618SX 0x2e: 0x%02x.\r\n", value);
+    }
 
-//------------------------------------------- 
-
-	//AVI
-	HDMI_WriteI2C_Byte( 0xff, 0x84 );
-	HDMI_WriteI2C_Byte( 0x43, 0x56 - HDMI_VIC - ( ( HDMI_Y << 5 ) + 0x10 ) );   //AVI_PB0
-	HDMI_WriteI2C_Byte( 0x44, ( HDMI_Y << 5 ) + 0x10 );                         //AVI_PB1
-	HDMI_WriteI2C_Byte( 0x47, HDMI_VIC );      
-
+	HDMI_WriteI2C_Byte( 0x2e, 0x00 );
 //-------------------------------------------
-	// HDMI_TX_Phy
+
+
+/*
+76 ff 82 00
+76 de 00 00
+76 de c0 00
+*/
+	HDMI_WriteI2C_Byte( 0xff, 0x82 );// register bank
+	HDMI_WriteI2C_Byte( 0xde, 0x00 );
+	HDMI_WriteI2C_Byte( 0xde, 0xc0 );
+
+/*
+76 ff 80 00
+76 16 f1 00
+76 18 dc 00
+76 18 fc 00
+76 16 f3 00
+*/
+	HDMI_WriteI2C_Byte( 0xff, 0x80 );// register bank
+	HDMI_WriteI2C_Byte( 0x16, 0xf1 );
+	HDMI_WriteI2C_Byte( 0x18, 0xdc );
+	HDMI_WriteI2C_Byte( 0x18, 0xfc );
+	HDMI_WriteI2C_Byte( 0x16, 0xf3 );
+
+
+	/*
+76 ff 82 00
+76 15 01 ff
+76 ea 02 ff
+	*/
+	HDMI_WriteI2C_Byte( 0xff, 0x82 );// register bank
+	HDMI_WriteI2C_Byte( 0x15, 0x01 );
+	HDMI_WriteI2C_Byte( 0xea, 0x02 );
+
+/*
+76 ff 82 00
+76 b9 18 00
+*/
+	HDMI_WriteI2C_Byte( 0xff, 0x82 );// register bank
+	HDMI_WriteI2C_Byte( 0xb9, 0x18 );
+
+
+/*
+// AVI 
+76 ff 84 00
+76 43 46 00
+76 44 10 00
+76 45 19 00
+76 47 00 00 // 1080P30 
+
+//
+76 10 2c 00
+76 12 64 00
+76 3d 0a 00
+//
+*/
+
+	HDMI_WriteI2C_Byte( 0xff, 0x84 );// register bank
+	HDMI_WriteI2C_Byte( 0x43, 0x46 );
+	HDMI_WriteI2C_Byte( 0x44, 0x10 );
+	HDMI_WriteI2C_Byte( 0x45, 0x19 );
+	HDMI_WriteI2C_Byte( 0x47, 0x00 );
+
+	HDMI_WriteI2C_Byte( 0x10, 0x2c);
+	HDMI_WriteI2C_Byte( 0x12, 0x64 );
+	HDMI_WriteI2C_Byte( 0x3d, 0x0a );
+	
+	/*
+// BT timing 720P60
+76 ff 82 00
+76 20 07 00
+76 21 80 00
+76 22 00 00
+76 23 58 00
+76 24 00 00
+76 25 2c 00
+76 26 00 00
+76 27 00 00
+76 36 04 00
+76 37 38 00
+76 38 00 00
+76 39 04 00
+76 3a 00 00
+76 3b 24 00
+76 3c 00 00
+76 3d 05 00
+	*/
+	HDMI_WriteI2C_Byte( 0xff, 0x82 );// register bank
+	HDMI_WriteI2C_Byte( 0x20, 0x07 );
+	HDMI_WriteI2C_Byte( 0x21, 0x80 );
+	HDMI_WriteI2C_Byte( 0x22, 0x00 );
+	HDMI_WriteI2C_Byte( 0x23, 0x58 );
+	HDMI_WriteI2C_Byte( 0x24, 0x00 );
+	HDMI_WriteI2C_Byte( 0x25, 0x2c );
+	HDMI_WriteI2C_Byte( 0x26, 0x00 );
+	HDMI_WriteI2C_Byte( 0x27, 0x00 );
+
+	HDMI_WriteI2C_Byte( 0x36, 0x04 );
+	HDMI_WriteI2C_Byte( 0x37, 0x38 );
+	HDMI_WriteI2C_Byte( 0x38, 0x00 );
+	HDMI_WriteI2C_Byte( 0x39, 0x04 );
+	HDMI_WriteI2C_Byte( 0x3a, 0x00 );
+	HDMI_WriteI2C_Byte( 0x3b, 0x24 );
+	HDMI_WriteI2C_Byte( 0x3c, 0x00 );
+	HDMI_WriteI2C_Byte( 0x3d, 0x05 );
+
+/*
+76 ff 81 00
+76 30 ea 00
+//
+76 31 44 00
+76 32 4a 00
+76 33 0b 00
+
+76 34 00 00
+76 35 00 00
+76 36 00 00
+76 37 44 00
+76 3f 0f 00
+
+76 40 a0 00
+76 41 a0 00
+76 42 a0 00
+76 43 a0 00
+76 44 0a 00
+*/
+
 	HDMI_WriteI2C_Byte( 0xff, 0x81 );// register bank
 	HDMI_WriteI2C_Byte( 0x30, 0xea );
 	HDMI_WriteI2C_Byte( 0x31, 0x44 );
 	HDMI_WriteI2C_Byte( 0x32, 0x4a );
 	HDMI_WriteI2C_Byte( 0x33, 0x0b );
+	
 	HDMI_WriteI2C_Byte( 0x34, 0x00 );
 	HDMI_WriteI2C_Byte( 0x35, 0x00 );
 	HDMI_WriteI2C_Byte( 0x36, 0x00 );
 	HDMI_WriteI2C_Byte( 0x37, 0x44 );
 	HDMI_WriteI2C_Byte( 0x3f, 0x0f );
+
 	HDMI_WriteI2C_Byte( 0x40, 0xa0 );
 	HDMI_WriteI2C_Byte( 0x41, 0xa0 );
 	HDMI_WriteI2C_Byte( 0x42, 0xa0 );
 	HDMI_WriteI2C_Byte( 0x43, 0xa0 );
 	HDMI_WriteI2C_Byte( 0x44, 0x0a );
-
-//-------------------------------------------
-	//LT8618SX_BT1120_Set
-	HDMI_WriteI2C_Byte( 0xff, 0x82 );
-	HDMI_WriteI2C_Byte( 0x20, (u8)( h_act / 256 ) );
-	HDMI_WriteI2C_Byte( 0x21, (u8)( h_act % 256 ) );
-	HDMI_WriteI2C_Byte( 0x22, (u8)( hfp / 256 ) );
-	HDMI_WriteI2C_Byte( 0x23, (u8)( hfp % 256 ) );
-	HDMI_WriteI2C_Byte( 0x24, (u8)( hs_width / 256 ) );
-	HDMI_WriteI2C_Byte( 0x25, (u8)( hs_width % 256 ) );
-	HDMI_WriteI2C_Byte( 0x26, 0x00 );
-	HDMI_WriteI2C_Byte( 0x27, 0x00 );
-	HDMI_WriteI2C_Byte( 0x36, (u8)( v_act / 256 ) );
-	HDMI_WriteI2C_Byte( 0x37, (u8)( v_act % 256 ) );
-	HDMI_WriteI2C_Byte( 0x38, (u8)( vfp / 256 ) );
-	HDMI_WriteI2C_Byte( 0x39, (u8)( vfp % 256 ) );
-	HDMI_WriteI2C_Byte( 0x3a, (u8)( vbp / 256 ) );
-	HDMI_WriteI2C_Byte( 0x3b, (u8)( vbp % 256 ) );
-	HDMI_WriteI2C_Byte( 0x3c, (u8)( vs_width / 256 ) );
-	HDMI_WriteI2C_Byte( 0x3d, (u8)( vs_width % 256 ) );
 	
 }
 
