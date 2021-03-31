@@ -241,7 +241,7 @@ unsigned long sonylens_send_msg_time = 0;  ////µ•Œª√Î
 #define SONYLENS_10_S_DELAY  (10)
 unsigned long sonylens_task1_completion_time;
 
-const char version[SONYLENS_VERSION_SIZE] = "JY1911";
+const char version[SONYLENS_VERSION_SIZE] = "JY1912";
 const CONFIG_PARAMS_t default_config_params = {
     0, 1,
     {// zoom
@@ -319,16 +319,10 @@ const CONFIG_PARAMS_t default_config_params = {
     },
     
     {// preset conf list
-        {0, 0, 0},
-        {1, 0, 0},
-        {2, 0, 0},
-        {3, 0, 0},
-        {4, 0, 0},
-        {5, 0, 0},
-        {6, 0, 0},
-        {7, 0, 0},
-        {8, 0, 0},
-        {9, 0, 0},
+        {0, 0, 1, 0},
+        {1, 0, 1, 0x1851},
+        {2, 0, 1, 0x2d45},
+        {3, 0, 1, 0x3f64},
     },
 };
 
@@ -376,7 +370,7 @@ static unsigned long menu_display_time = 0;
 SONY_MENU_t current_menu;
 
 const SONY_MENU_t main_menu = {
-    MENU_MAIN, "MENU", 9, 0, sonylens_main_menu_init,
+    MENU_MAIN, "MENU", 6, 0, sonylens_main_menu_init,
     {
         {
             MENU_ITEM_ZOOM_SET,
@@ -387,6 +381,7 @@ const SONY_MENU_t main_menu = {
             NULL,
             sonylens_main_menu_zoom_set_action,
         },
+        #if 0
         {
             MENU_ITEM_FOCUS_SET,
             "FOCUS SET", 
@@ -414,6 +409,7 @@ const SONY_MENU_t main_menu = {
             NULL, 
             sonylens_main_menu_wb_set_action,
         },
+        #endif
         {
             MENU_ITEM_ADVANCE,
             "ADVANCE", 
@@ -1311,7 +1307,7 @@ void sonylens_print_config_params(CONFIG_PARAMS_t* config)
     }
 
     printf("\r\n preset conf:");
-    for(i = 0; i < 10; i++)
+    for(i = 0; i < sizeof(config->preset_conf_list)/sizeof(PRESET_CONF_t); i++)
     {
         printf("\r\n  no.:%d time:%d exist:%d zoom_ratio:%d", 
             config->preset_conf_list[i].no,
@@ -5757,7 +5753,7 @@ char* sonylens_camera_id_display_right(void)
 //int current_preset_no = 0;
 int sonylens_preset_no_get_count(void)
 {
-    return 10;
+    return sizeof(config_params.preset_conf_list)/sizeof(PRESET_CONF_t);
 }
 int sonylens_preset_no_get(void)
 {
@@ -6655,6 +6651,7 @@ void sonylens_control_f3(void) {
 }
 void sonylens_control_f4(void) {
     // situation
+    #if 1
     int i = 0;
     int count = sonylens_preset_no_get_count();
     int index = sonylens_preset_no_get();
@@ -6673,6 +6670,9 @@ void sonylens_control_f4(void) {
             break;
         }
     }
+	#else
+	sonylens_set_bright_plus();
+	#endif
 }
 void sonylens_control_f5(void) {
     sonylens_set_bright_plus();

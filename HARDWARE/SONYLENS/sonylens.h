@@ -539,7 +539,7 @@ typedef struct CONFIG_PARAMS {
     } general;
 
     PRIVACY_ZONE_t privacy_zone_list[4];
-    PRESET_CONF_t preset_conf_list[10];
+    PRESET_CONF_t preset_conf_list[4];
 } CONFIG_PARAMS_t;
 #pragma pack ()
 
@@ -1042,3 +1042,4 @@ void sonylens_zoom_set_tele_limit(unsigned char value);
 void sonylens_task(void);
 
 #endif
+

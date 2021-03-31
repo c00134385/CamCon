@@ -96,7 +96,7 @@ int main(void)
 	LED_Init();
     
 
-	check = checkIdCode();
+	//check = checkIdCode();
 	if(!check)
 	{
 		printf("%c", 64);
