@@ -2545,6 +2545,7 @@ unsigned char sonylens_get_Cam(unsigned char reg) {
 
 void sonylens_splash_display(void)
 {
+#if 0
     int i;
     int count = sizeof(splash)/sizeof(SONY_SPLASH_t);
     printf("\r\n %s() is called.", __FUNCTION__);
@@ -2557,16 +2558,19 @@ void sonylens_splash_display(void)
     sony_ui_display_all(true);
     splash_display_time = GetSysTick_10Ms();
     splash_display = true;
+#endif
 }
 
 void sonylens_splash_clear(void)
 {
+#if 0
     if((true == splash_display) && ((GetSysTick_10Ms() - splash_display_time) > 800))
     {
         sony_ui_display_all(false);
         sony_ui_clear_all();
         splash_display = false;
     }
+#endif	
 }
 void sonylens_main_menu_on(void) {
     if(!menu_display)
@@ -5963,20 +5967,24 @@ void sonylens_set_zoom_stop()
 
 void sonylens_zoom_ratio_display(char * title)
 {
+#if 0
     sony_ui_set_title(0xA, NULL, title, NULL);
     sony_ui_display_line(0xA, true);
     zoom_ratio_display = true;
     zoom_ratio_display_time = GetSysTick_10Ms();
+#endif
 }
 
 void sonylens_zoom_ratio_clear(void)
 {
+#if 0
     if(zoom_ratio_display)
     {
         sony_ui_clear_line(0xA);
         sony_ui_display_line(0xA, false);
         zoom_ratio_display = false;
     }
+#endif
 }
 
 bool sonylens_set_zoom_value(uint32 zoom_value)
@@ -6105,15 +6113,6 @@ void sonylens_zoom_process(void)
     {
         sonylens_zoom_ratio_clear();
     }
-
-    #if 0
-    if((!zoom_ratio_display) && (config_params.zoom.zoom_display == 1))
-    {
-        sonylens_get_zoom_value(&current_zoom_ratio);
-        current_zoom_index = sonylens_get_zoom_index(current_zoom_ratio);
-        sonylens_zoom_ratio_display(sonylens_get_zoom_desc(current_zoom_index));
-    } 
-    #endif
 }
 
 
@@ -6548,6 +6547,7 @@ static bool tips_display = false;
 
 void sonylens_tips_display(char * title)
 {
+#if 0
     if(menu_display || splash_display)
     {
         return;
@@ -6556,16 +6556,19 @@ void sonylens_tips_display(char * title)
     sony_ui_display_line(0xA, true);
     tips_display = true;
     tips_display_time = GetSysTick_10Ms();
+#endif
 }
 
 void sonylens_tips_clear(void)
 {
+#if 0
     if(tips_display)
     {
         sony_ui_clear_line(0xA);
         sony_ui_display_line(0xA, false);
         tips_display = false;
     }
+#endif
 }
 
 void sonylens_tips_display_process(void)
@@ -6990,7 +6993,7 @@ void sonylens_task(void)
         #endif
         break;
     case SONY_SET_SPLASH:
-				gennum_reset_high();
+		gennum_reset_high();
         sonylens_splash_display();
         splash_set_done = true;
         sonylens_taskstate = SONY_IDLE;
