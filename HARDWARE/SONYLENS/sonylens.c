@@ -241,7 +241,7 @@ unsigned long sonylens_send_msg_time = 0;  ////µ•Œª√Î
 #define SONYLENS_10_S_DELAY  (10)
 unsigned long sonylens_task1_completion_time;
 
-const char version[SONYLENS_VERSION_SIZE] = "JY1911";
+const char version[SONYLENS_VERSION_SIZE] = "JY2103";
 const CONFIG_PARAMS_t default_config_params = {
     0, 1,
     {// zoom
@@ -6943,7 +6943,7 @@ void sonylens_task(void)
         visca_result = visca_set_title_clear(sonylens_camera_id, 0xF);
         if(VISCA_result_ok == visca_result) {
             titles_clear_done = true;
-            sonylens_taskstate = SONY_IDLE;
+            sonylens_taskstate = SONY_INIT_CONFIG;
         }
         else
         {
