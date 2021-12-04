@@ -6841,7 +6841,7 @@ void sonylens_task(void)
     case SONY_SET_ADDRESS:
         visca_result = visca_set_address(sonylens_camera_id);
         if(VISCA_result_ok == visca_result) {
-            sonylens_taskstate = SONY_IF_CLEAR;
+            sonylens_taskstate = SONY_GET_VERSION;
         } else if(VISCA_result_network_change == visca_result) {
             sonylens_taskstate = SONY_SET_ADDRESS;
         } else {
