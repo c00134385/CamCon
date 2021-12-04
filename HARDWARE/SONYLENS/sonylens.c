@@ -317,13 +317,28 @@ const CONFIG_PARAMS_t default_config_params = {
         {2, 0, 0, 0, 0, 0},
         {3, 0, 0, 0, 0, 0},
     },
-    
+    #if defined(SONYLENS_10X_SUPPORT)
     {// preset conf list
+        {0, 0, 1, 0},
+        {1, 0, 1, 0x1448},
+        {2, 0, 1, 0x335f},
+        {3, 0, 1, 0x3ac7},
+    },
+    #elif defined(SONYLENS_20X_SUPPORT)
+	{// preset conf list
         {0, 0, 1, 0},
         {1, 0, 1, 0x1851},
         {2, 0, 1, 0x2d45},
         {3, 0, 1, 0x3f64},
     },
+    #else
+	{// preset conf list
+        {0, 0, 1, 0},
+        {1, 0, 1, 0x1851},
+        {2, 0, 1, 0x2d45},
+        {3, 0, 1, 0x3f64},
+    },
+    #endif
 };
 
 CONFIG_PARAMS_t config_params;
