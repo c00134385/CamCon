@@ -200,6 +200,8 @@ bool HDMI_WriteI2C_ByteN(u8 RegAddr, u8 *d,u16 N)
 
 bool LT8618SX_Configure(void)
 {
+// HDMI reset/det is unused.
+#if 0
     GPIO_InitTypeDef  GPIO_InitStructure;
  	
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_AFIO, ENABLE);	 //使能PB,PE端口时钟
@@ -221,7 +223,7 @@ bool LT8618SX_Configure(void)
 
     Wait10Ms(100);
 
-    
+#endif    
     
     printf("\r\nHDMI LT8618 Init done.\r\n");
 	return 1;
