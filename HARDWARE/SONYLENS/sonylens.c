@@ -6661,8 +6661,10 @@ void sonylens_control_f2(void) {
     int val = key_freeze;
     sonylens_key_image_freeze_set((val == 0)?1:0);
 }
+bool monochromeImage = false;
 void sonylens_control_f3(void) {
-    sonylens_set_exposure_gain_plus();
+	monochromeImage = !monochromeImage;
+    visca_set_image_icr(sonylens_camera_id, monochromeImage?0x02:0x03);
 }
 void sonylens_control_f4(void) {
     // situation

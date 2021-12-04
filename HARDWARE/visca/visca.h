@@ -221,7 +221,8 @@ VISCA_result_e visca_set_image_freeze(int address, uint8 mirror);
 
 VISCA_result_e visca_get_image_pic_effect(int address, uint8* mirror);
 VISCA_result_e visca_set_image_pic_effect(int address, uint8 mirror);
-
+VISCA_result_e visca_get_image_icr(int address, uint8* value);
+VISCA_result_e visca_set_image_icr(int address, uint8 value);
 /* privacy zone set */
 VISCA_result_e visca_get_privacy_mask(int address);
 VISCA_result_e visca_set_privacy_mask(int address, uint8 mask, uint8 w, uint8 h);

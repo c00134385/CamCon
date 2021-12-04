@@ -3543,6 +3543,52 @@ VISCA_result_e visca_set_image_pic_effect(int address, uint8 value) {
     return ret;
 }
 
+VISCA_result_e visca_get_image_icr(int address, uint8* value) {
+    VISCA_result_e ret = VISCA_result_ok;
+    return ret;
+}
+VISCA_result_e visca_set_image_icr(int address, uint8 value) {
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_COMMAND);
+    visca_append_byte(&packet, VISCA_CATEGORY_CAMERA1);
+    visca_append_byte(&packet, 0x01);
+    visca_append_byte(&packet, value); // 0x02:ON  0x03:OFF
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+    
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_ack);
+
+    printf("\r\n set image icr?");
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
+            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
+                printf("\r\n set image icr done!");
+                ret = VISCA_result_ok;
+                break;
+            } else {
+                visca_print(input_buf, input_buf_index);
+                ret = VISCA_result_fail;
+                break;
+            }
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+
+    visca_set_state(VISCA_state_idle);
+    return ret;
+}
+
+
 VISCA_result_e visca_get_privacy_mask(int address)
 {
     VISCA_result_e ret = VISCA_result_ok;
