@@ -1,9 +1,9 @@
 /*----------------------------------------------------------------------------*/
 /* sonylens.c                                                                   */
-/* ÃèÊö:sony ±ä±¶»úÐÍÍ¨Ñ¶³ÌÐò                                                          */
+/* ï¿½ï¿½ï¿½ï¿½:sony ï¿½ä±¶ï¿½ï¿½ï¿½ï¿½Í¨Ñ¶ï¿½ï¿½ï¿½ï¿½                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-/* 2017/10/17 yihuagang½¨Á¢ V0.1                                                  */
+/* 2017/10/17 yihuagangï¿½ï¿½ï¿½ï¿½ V0.1                                                  */
 /* 2017/10/17   */
 /* 2017/10/17 yihuagang  v0.3                                                      */
 /*            */
@@ -2033,13 +2033,13 @@ VISCA_result_e visca_set_focus_near_limit(int address, uint32 value) {
     visca_send_packet(&packet);
     visca_set_state(VISCA_state_wait_ack);
 
-    printf("\r\n set zoom_value?");
+    printf("\r\n set focus_value?");
 
     while(true) {
         Wait10Ms(1);
         if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
             if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
-                printf("\r\n set zoom_value done!");
+                printf("\r\n set focus_value done!");
                 ret = VISCA_result_ok;
                 break;
             } else {

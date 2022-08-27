@@ -1,10 +1,10 @@
 
 /*----------------------------------------------------------------------------*/
 /* sonylens.c                                                                   */
-/* ÃèÊö:sony ±ä±¶»úÐÍÍ¨Ñ¶³ÌÐò                                                          */
+/* ï¿½ï¿½ï¿½ï¿½:sony ï¿½ä±¶ï¿½ï¿½ï¿½ï¿½Í¨Ñ¶ï¿½ï¿½ï¿½ï¿½                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-/* 2017/10/17 yihuagang½¨Á¢ V0.1                                                  */
+/* 2017/10/17 yihuagangï¿½ï¿½ï¿½ï¿½ V0.1                                                  */
 /* 2017/10/17   */
 /* 2017/10/17 yihuagang  v0.3                                                      */
 /*            */
@@ -221,7 +221,7 @@ static bool monitor_mode_changed = false;
 /* private */
 unsigned char sonylens_camera_id = 1;
 static unsigned long rec_systick_mark_sonylens = 0;
-unsigned long sonylens_task_t_sec = 0;  ////µ¥Î»Ãë
+unsigned long sonylens_task_t_sec = 0;  ////ï¿½ï¿½Î»ï¿½ï¿½
 unsigned char sonylens_power_state;
 uint32 model_code;
 uint32 rom_version;
@@ -231,17 +231,17 @@ uint32 sonylens_current_zoom_ratio = 0; // 1x
 
 
 #define SONYLENS_REPLY_MSG_BUFF_LEN 100
-unsigned char sonylens_reply_msg[SONYLENS_REPLY_MSG_BUFF_LEN];        //NMEA-0183µ¥Ö¡³¤¶È×î³¤210 byte
+unsigned char sonylens_reply_msg[SONYLENS_REPLY_MSG_BUFF_LEN];        //NMEA-0183ï¿½ï¿½Ö¡ï¿½ï¿½ï¿½ï¿½ï¿½î³¤210 byte
 static int sonylens_reply_msg_len = 0;
 static SONY_EVENT_E event_queue[16];
 
 /*define the state machine of command interval*/
 #define SONYLENS_SEND_MSG_WAIT_MS  (300)
-unsigned long sonylens_send_msg_time = 0;  ////µ¥Î»Ãë
+unsigned long sonylens_send_msg_time = 0;  ////ï¿½ï¿½Î»ï¿½ï¿½
 #define SONYLENS_10_S_DELAY  (10)
 unsigned long sonylens_task1_completion_time;
 
-const char version[SONYLENS_VERSION_SIZE] = "JY1903";
+const char version[SONYLENS_VERSION_SIZE] = "JYH3.1";
 const CONFIG_PARAMS_t default_config_params = {
     0, 1,
     {// zoom
@@ -282,7 +282,7 @@ const CONFIG_PARAMS_t default_config_params = {
         7, // expcomp
         0, // wdr
         0, // ircut
-        0, // nr_level
+        2, // nr_level
         0, // stabilizer
         0, // defog_mode
         0, // alarm_out
@@ -1323,7 +1323,7 @@ void sonylens_print_config_params(CONFIG_PARAMS_t* config)
     printf("\r\n -------------------------------");
 }
 
-unsigned long camera_power_on_sec = 0;  ////µ¥Î»Ãë
+unsigned long camera_power_on_sec = 0;  ////ï¿½ï¿½Î»ï¿½ï¿½
 
 void sonylens_init(void) {
     int len;
@@ -7047,11 +7047,11 @@ void sonylens_task(void)
         }
         
         // check zoom ratio
-        if(!zoom_ratio_set_done)
-        {
-            sonylens_taskstate = SONY_SET_ZOOM_RATIO;
-            break;
-        }
+        // if(!zoom_ratio_set_done)
+        // {
+        //     sonylens_taskstate = SONY_SET_ZOOM_RATIO;
+        //     break;
+        // }
 
         // display splash titles
         if(!splash_set_done)
