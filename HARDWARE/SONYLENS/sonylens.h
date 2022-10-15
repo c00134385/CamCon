@@ -4,8 +4,8 @@
 
 #include "integer.h"
 //#define SONYLENS_10X_SUPPORT
-#define SONYLENS_20X_SUPPORT
-//#define SONYLENS_30X_SUPPORT
+//#define SONYLENS_20X_SUPPORT
+#define SONYLENS_30X_SUPPORT
 
 
 
