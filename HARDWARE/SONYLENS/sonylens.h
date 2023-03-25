@@ -22,8 +22,10 @@ typedef enum SONY_RESULT {
 
 
 typedef enum SONY_STATE{
+    SONY_UNKNOWN = -1,
     SONY_12V_ON = 0,
     SONY_VISCA_INIT,
+    SONY_BOOT_CHECK,
     SONY_IDLE,
     SONY_IDLE_2,
     SONY_SET_ADDRESS,

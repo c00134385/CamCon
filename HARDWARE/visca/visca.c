@@ -1,9 +1,9 @@
 /*----------------------------------------------------------------------------*/
 /* sonylens.c                                                                   */
-/* ÃèÊö:sony ±ä±¶»úÐÍÍ¨Ñ¶³ÌÐò                                                          */
+/* ï¿½ï¿½ï¿½ï¿½:sony ï¿½ä±¶ï¿½ï¿½ï¿½ï¿½Í¨Ñ¶ï¿½ï¿½ï¿½ï¿½                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-/* 2017/10/17 yihuagang½¨Á¢ V0.1                                                  */
+/* 2017/10/17 yihuagangï¿½ï¿½ï¿½ï¿½ V0.1                                                  */
 /* 2017/10/17   */
 /* 2017/10/17 yihuagang  v0.3                                                      */
 /*            */
@@ -709,6 +709,7 @@ VISCA_result_e visca_get_zoom_value(int address, uint32 *value) {
     while(true) {
         Wait10Ms(1);
         if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            visca_print(input_buf, input_buf_index);
             if(visca_is_inq_result(input_buf, input_buf_index)) {
                 printf("\r\n get zoom_value done. %x-%x-%x-%x", input_buf[2], input_buf[3], input_buf[4], input_buf[5]); 
                 *value=(((uint32)input_buf[2])<<12)+(((uint32)input_buf[3])<<8)+(((uint32)input_buf[4])<<4)+(uint32)input_buf[5];
@@ -724,6 +725,8 @@ VISCA_result_e visca_get_zoom_value(int address, uint32 *value) {
             break;
         }
     }
+    visca_set_state(VISCA_state_idle);
+    return ret;
 }
 VISCA_result_e visca_set_zoom_value(int address, uint32 value) {
     VISCA_result_e ret = VISCA_result_unknown;

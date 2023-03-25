@@ -206,6 +206,7 @@ extern char sonylens_rx_buffer[],sonylens_tx_buffer[];
 
 /*state machine*/
 static uint16_t sonylens_taskstate = SONY_12V_ON;
+static uint16_t sonylens_last_taskstate = SONY_UNKNOWN;
 static uint16_t sonylens_taskcount = 0;
 static SONY_CMD_STATE_E sonylens_cmd_state = SONY_CMD_IDLE;
 unsigned long sonylens_power_on_time = 0;
@@ -241,7 +242,7 @@ unsigned long sonylens_send_msg_time = 0;  ////单位秒
 #define SONYLENS_10_S_DELAY  (10)
 unsigned long sonylens_task1_completion_time;
 
-const char version[SONYLENS_VERSION_SIZE] = "JY1912";
+const char version[SONYLENS_VERSION_SIZE] = "JY3.3";
 const CONFIG_PARAMS_t default_config_params = {
     0, 1,
     {// zoom
@@ -6852,8 +6853,17 @@ void sonylens_task(void)
         {
             pelco_d_init();
         }
-        
-        sonylens_taskstate = SONY_SET_ADDRESS;
+        sonylens_taskstate = SONY_BOOT_CHECK;
+        break;
+    case SONY_BOOT_CHECK:
+        visca_result = visca_get_zoom_value(sonylens_camera_id, &u32Value);
+        printf("\r\n visca_result: %d", visca_result);
+        if(VISCA_result_ok == visca_result) {
+            printf("\r\n zoom_value: 0x%x", u32Value);
+            sonylens_taskstate = SONY_SET_ADDRESS;
+        } else {
+            Wait10Ms(100);
+        }
         break;
     case SONY_SET_ADDRESS:
         visca_result = visca_set_address(sonylens_camera_id);
@@ -7064,9 +7074,7 @@ void sonylens_task(void)
 		#ifdef MPR121_ENABLE
         mpr121_process();
         #endif
-		
 		break;
-
     case FUNC_TEST:
         Wait10Ms(500);
         sonylens_taskstate = AE_SET;
@@ -7122,13 +7130,10 @@ void sonylens_task(void)
         sonylens_taskstate = SONY_IDLE_2;
         break;
     case SONY_IDLE_2:
-        
         break;
 	default:
 		break;
    }
-  
-
     rec_systick_mark_sonylens = GetSysTick_10Ms();
 }
 
