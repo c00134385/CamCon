@@ -20,7 +20,7 @@ const char version_msg[200]={
 };
 
 
-unsigned long main_task_t_sec = 0;  ////µ•Œª√Î
+unsigned long main_task_t_sec = 0;  ////Âçï‰ΩçÁßí
 
 
 

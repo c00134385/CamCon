@@ -1,10 +1,10 @@
 
 /*----------------------------------------------------------------------------*/
 /* sonylens.c                                                                   */
-/* ÃèÊö:sony ±ä±¶»úĞÍÍ¨Ñ¶³ÌĞò                                                          */
+/* æè¿°:sony å˜å€æœºå‹é€šè®¯ç¨‹åº                                                          */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-/* 2017/10/17 yihuagang½¨Á¢ V0.1                                                  */
+/* 2017/10/17 yihuagangå»ºç«‹ V0.1                                                  */
 /* 2017/10/17   */
 /* 2017/10/17 yihuagang  v0.3                                                      */
 /*            */
@@ -221,7 +221,7 @@ static bool monitor_mode_changed = false;
 /* private */
 unsigned char sonylens_camera_id = 1;
 static unsigned long rec_systick_mark_sonylens = 0;
-unsigned long sonylens_task_t_sec = 0;  ////µ¥Î»Ãë
+unsigned long sonylens_task_t_sec = 0;  ////å•ä½ç§’
 unsigned char sonylens_power_state;
 uint32 model_code;
 uint32 rom_version;
@@ -231,13 +231,13 @@ uint32 sonylens_current_zoom_ratio = 0; // 1x
 
 
 #define SONYLENS_REPLY_MSG_BUFF_LEN 100
-unsigned char sonylens_reply_msg[SONYLENS_REPLY_MSG_BUFF_LEN];        //NMEA-0183µ¥Ö¡³¤¶È×î³¤210 byte
+unsigned char sonylens_reply_msg[SONYLENS_REPLY_MSG_BUFF_LEN];        //NMEA-0183å•å¸§é•¿åº¦æœ€é•¿210 byte
 static int sonylens_reply_msg_len = 0;
 static SONY_EVENT_E event_queue[16];
 
 /*define the state machine of command interval*/
 #define SONYLENS_SEND_MSG_WAIT_MS  (300)
-unsigned long sonylens_send_msg_time = 0;  ////µ¥Î»Ãë
+unsigned long sonylens_send_msg_time = 0;  ////å•ä½ç§’
 #define SONYLENS_10_S_DELAY  (10)
 unsigned long sonylens_task1_completion_time;
 
@@ -1334,7 +1334,7 @@ void sonylens_print_config_params(CONFIG_PARAMS_t* config)
     printf("\r\n -------------------------------");
 }
 
-unsigned long camera_power_on_sec = 0;  ////µ¥Î»Ãë
+unsigned long camera_power_on_sec = 0;  ////å•ä½ç§’
 
 void sonylens_init(void) {
     int len;
