@@ -249,7 +249,6 @@ const CONFIG_PARAMS_t default_config_params = {
         0, 
         3, // zoom speed 
         0, 
-        0, 
         0
     }, 
 
@@ -476,7 +475,7 @@ const SONY_MENU_t main_menu = {
 
 
 const SONY_MENU_t zoom_menu = {
-    MENU_ZOOM_SET, "ZOOM SET", 5, 0, sonylens_zoom_menu_init,
+    MENU_ZOOM_SET, "ZOOM SET", 4, 0, sonylens_zoom_menu_init,
     {
         {
             MENU_ITEM_ZOOM_SPEED,
@@ -495,16 +494,6 @@ const SONY_MENU_t zoom_menu = {
             sonylens_dig_zoom_get, 
             sonylens_dig_zoom_set, 
             sonylens_dig_zoom_right, 
-            NULL,
-        },
-
-        {
-            MENU_ITEM_ZOOM_OSD,
-            "OSD", 
-            sonylens_osd_get_count, 
-            sonylens_osd_get, 
-            sonylens_osd_set, 
-            sonylens_osd_right, 
             NULL,
         },
         {
@@ -1427,11 +1416,8 @@ void sonylens_zoom_init(void)
     // dig zoom
     sonylens_dig_zoom_set(config_params.zoom.dig_zoom);
 
-    // osd
-    // sonylens_osd_set(config_params.zoom.osd);
-
     // zoom display
-    sonylens_osd_set(config_params.zoom.zoom_display);
+    sonylens_zoom_display_set(config_params.zoom.zoom_display);
 }
 
 void sonylens_focus_init(void) 
@@ -3650,27 +3636,6 @@ void sonylens_dig_zoom_set(int param) {
     }
 
     config_params.zoom.dig_zoom = param;
-}
-
-//int current_osd = 0;
-char* osd[] = {
-    "OFF","ON"
-};
-int sonylens_osd_get_count(void)
-{
-    return 2;
-}
-int sonylens_osd_get(void)
-{
-    return config_params.zoom.osd;
-}
-void sonylens_osd_set(int param)
-{
-    config_params.zoom.osd = param;
-}
-char* sonylens_osd_right(void)
-{
-    return osd[config_params.zoom.osd];
 }
 
 char* zoom_display[] = {
@@ -6975,7 +6940,7 @@ void sonylens_task(void)
         visca_result = visca_set_title_clear(sonylens_camera_id, 0xF);
         if(VISCA_result_ok == visca_result) {
             titles_clear_done = true;
-            sonylens_taskstate = SONY_IDLE;
+            sonylens_taskstate = SONY_INIT_CONFIG;
         }
         else
         {
@@ -6985,12 +6950,12 @@ void sonylens_task(void)
         break;
     case SONY_INIT_CONFIG:
         sonylens_zoom_init();
-        sonylens_focus_init();
-        sonylens_general_init();
-        sonylens_exposure_init();
-        sonylens_wb_init();
-        sonylens_advance_init();
-        sonylens_image_init();
+        // sonylens_focus_init();
+        // sonylens_general_init();
+        // sonylens_exposure_init();
+        // sonylens_wb_init();
+        // sonylens_advance_init();
+        // sonylens_image_init();
         sonylens_taskstate = SONY_IDLE;
         break;
     case SONY_SET_ZOOM_RATIO:
