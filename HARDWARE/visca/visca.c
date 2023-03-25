@@ -1389,20 +1389,94 @@ VISCA_result_e visca_set_digital_zoom(int address, uint8 enable) {
 }
 
 VISCA_result_e visca_get_zoom_osd(int address, uint8 *enable) {
-    VISCA_result_e ret = VISCA_result_ok;
+    VISCA_result_e ret = VISCA_result_unknown;
     return ret;
 }
-VISCA_result_e visca_set_zoom_osd(int address, uint8 enable) {
-    VISCA_result_e ret = VISCA_result_ok;
+VISCA_result_e visca_set_zoom_osd(int address, uint8 value) {
+    VISCA_result_e ret = VISCA_result_unknown;
     return ret;
 }
 
 VISCA_result_e visca_get_zoom_display(int address, uint8 *enable) {
-    VISCA_result_e ret = VISCA_result_ok;
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, VISCA_INQUIRY);
+    visca_append_byte(&packet, 0x0A);
+    visca_append_byte(&packet, 0x01);
+    visca_append_byte(&packet, 0x60);
+    visca_append_byte(&packet, 0x01);
+    visca_append_byte(&packet, 0x00);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+    visca_set_reply_msg(address);
+        
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_result);
+
+    printf("\r\n get_digital_zoom?");
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index > 0) && (input_buf[input_buf_index-1] == 0xFF)) {
+            if(visca_is_inq_result(input_buf, input_buf_index)) {
+                printf("\r\n get_digital_zoom done!");
+                *enable = input_buf[2];
+                ret = VISCA_result_ok;
+                break;
+            } else {
+                ret = VISCA_result_fail;
+                break;
+            }
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+
+    visca_set_state(VISCA_state_idle);
     return ret;
 }
-VISCA_result_e visca_set_zoom_display(int address, uint8 enable) {
-    VISCA_result_e ret = VISCA_result_ok;
+VISCA_result_e visca_set_zoom_display(int address, uint8 value) {
+    VISCA_result_e ret = VISCA_result_unknown;
+    VISCA_packet_t packet;
+    visca_set_state(VISCA_state_send);
+    visca_init_packet(&packet, address);
+    visca_append_byte(&packet, 0x0A);
+    visca_append_byte(&packet, 0x01);
+    visca_append_byte(&packet, 0x60);
+    visca_append_byte(&packet, 0x01);
+    visca_append_byte(&packet, value);
+    visca_append_byte(&packet, VISCA_TERMINATOR);
+
+    visca_set_reply_msg(address);
+    
+    visca_send_packet(&packet);
+    visca_set_state(VISCA_state_wait_ack);
+
+    printf("\r\n %s?", __FUNCTION__);
+
+    while(true) {
+        Wait10Ms(1);
+        if((input_buf_index == sizeof(ack_completion_msg)) && (input_buf[input_buf_index-1] == 0xFF)) {
+            if(visca_is_ack_completion(input_buf, sizeof(ack_completion_msg))) {
+                printf("\r\n %s done!", __FUNCTION__);
+                ret = VISCA_result_ok;
+                break;
+            } else {
+                visca_print(input_buf, input_buf_index);
+                ret = VISCA_result_fail;
+                break;
+            }
+        } else if(visca_is_no_response()){
+            visca_print(input_buf, input_buf_index);
+            ret = VISCA_result_no_response;
+            break;
+        }
+    }
+
+    visca_set_state(VISCA_state_idle);
     return ret;
 }
 

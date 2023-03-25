@@ -1428,10 +1428,10 @@ void sonylens_zoom_init(void)
     sonylens_dig_zoom_set(config_params.zoom.dig_zoom);
 
     // osd
-    //sonylens_osd_set(config_params.zoom.osd);
+    // sonylens_osd_set(config_params.zoom.osd);
 
     // zoom display
-    //sonylens_osd_set(config_params.zoom.zoom_display);
+    sonylens_osd_set(config_params.zoom.zoom_display);
 }
 
 void sonylens_focus_init(void) 
@@ -2806,17 +2806,7 @@ void sonylens_menu_move_leftright(int step) {
     count = menu_item->get_count();
     value = menu_item->get();
     
-    if(step > 0) {
-        value++;
-        if(value >= count) {
-            value = 0;
-        }
-    } else {
-        value--;
-        if(value < 0) {
-            value = count - 1;
-        }
-    }
+    value = (value + count + step) % count;
 
     menu_item->set(value);
     
@@ -3676,21 +3666,6 @@ int sonylens_osd_get(void)
 }
 void sonylens_osd_set(int param)
 {
-    VISCA_result_e result = VISCA_result_ok;
-    uint8 enable;
-    
-    if(param == 0) {
-        enable = 0x03;
-    } else {
-        enable = 0x02;
-    }
-    
-    result = visca_set_zoom_osd(sonylens_camera_id, enable);
-    if(result != VISCA_result_ok) {
-        printf("\r\n sonylens_osd_set failed. result:%d", result);
-        return;
-    }
-
     config_params.zoom.osd = param;
 }
 char* sonylens_osd_right(void)
@@ -3707,10 +3682,37 @@ int sonylens_zoom_display_get_count(void)
 }
 int sonylens_zoom_display_get(void)
 {
+    VISCA_result_e result = VISCA_result_ok;
+    uint8 value;
+    result = visca_get_zoom_display(sonylens_camera_id, &value);
+    if(result != VISCA_result_ok) {
+        return config_params.focus.mode;
+    }
+
+    if(value == 0x02) {
+        config_params.zoom.zoom_display = 1;
+    } else {
+        config_params.zoom.zoom_display = 0;
+    }
+
     return config_params.zoom.zoom_display;
 }
 void sonylens_zoom_display_set(int param)
 {
+    VISCA_result_e result = VISCA_result_ok;
+    uint8 enable;
+    
+    if(param == 0) {
+        enable = 0x03;
+    } else {
+        enable = 0x02;
+    }
+    
+    result = visca_set_zoom_display(sonylens_camera_id, enable);
+    if(result != VISCA_result_ok) {
+        printf("\r\n %s failed. result:%d", __FUNCTION__, result);
+        return;
+    }
     config_params.zoom.zoom_display = param;
 }
 char* sonylens_zoom_display_right(void)
