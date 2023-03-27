@@ -4870,11 +4870,7 @@ char* sonylens_image_pic_effect_right(void)
 //int current_general_format = 0;
 char* general_format[] = {
     "1080P60", "1080P50", "1080P30", "1080P25", 
-    "1080I60", "1080I50", 
     "720P60", "720P50", "720P30", "720P25",
-    #if 0
-    "1080P59.94"
-    #endif
 };
 
 uint8 sonylens_get_monitor_mode(int index)
@@ -4883,37 +4879,31 @@ uint8 sonylens_get_monitor_mode(int index)
     switch(index)
     {
         case 0:
-            value = 0x15;
+            value = 0x13;
             break;
         case 1:
             value = 0x14;
             break;
         case 2:
-            value = 0x7;
+            value = 0x6;
             break;
         case 3:
             value = 0x8;
             break;
         case 4:
-            value = 0x2;
+            value = 0x9;
             break;
         case 5:
-            value = 0x4;
-            break;
-        case 6:
-            value = 0xA;
-            break;
-        case 7:
             value = 0xC;
             break;
-        case 8:
-            value = 0xF;
+        case 6:
+            value = 0xE;
             break;
-        case 9:
+        case 7:
             value = 0x11;
             break;
         default:
-            value = 0x7;  // 1080P30
+            value = 0x6;  // 1080P30
             break;
     }
 
